@@ -160,6 +160,29 @@ Publicação via GitHub Actions com rsync por SSH. Deploy **manual** (você aper
 
 ---
 
+## Os documentos são atualizados junto com o código
+
+Documentação que envelhece é pior que documentação nenhuma — todo mundo confia nela e ela mente. Por isso, toda alteração de código passa por esta tabela antes de a tarefa ser dada como pronta:
+
+| O que você mexeu | O que precisa ser atualizado |
+|---|---|
+| Funcionalidade nova, alterada ou removida | `PRD.md` e `docs/FSD.md` |
+| Regra de negócio, validação, cálculo | `PRD.md` e `docs/FSD.md` |
+| Tabela, campo, migration, entidade | `docs/FSD.md` |
+| Rota, endpoint, tela nova | `docs/FSD.md` |
+| Stack, banco, biblioteca, hospedagem | `DECISOES_TECNICAS.md` e `INSUMOS.md` |
+| Login, perfil, permissão | `DECISOES_TECNICAS.md` e `docs/FSD.md` |
+| Variável de ambiente, integração externa | `INSUMOS.md` e `DECISOES_TECNICAS.md` |
+| Cor, fonte, espaçamento, componente | `docs/DESIGN.md` |
+| Etapa nova descoberta no caminho | `docs/PLANO.md` |
+| Mudou como rodar ou testar | `CLAUDE.md` |
+| Qualquer alteração de código | `docs/STATUS.md` — sempre |
+| Qualquer erro, mesmo já corrigido | `docs/ERROS.md` — sempre |
+
+Ao terminar, a IA diz em uma linha quais documentos atualizou e, para os que não atualizou, qual conferiu e por que não precisou mexer. Ficar calado sobre um documento conta como esquecimento.
+
+**E tem trava:** se houve alteração de código e o `STATUS.md` não foi atualizado, o encerramento é bloqueado — a tabela acima volta como pendência e o trabalho continua até estar registrado.
+
 ## As travas: o que o plugin impede na prática
 
 Isto não depende de a IA lembrar das regras. São hooks que rodam por fora e podem dizer "não".
@@ -171,6 +194,7 @@ Isto não depende de a IA lembrar das regras. São hooks que rodam por fora e po
 | **Leitura cara** | Bloqueia `Read`, `Grep` e `Glob` em arquivos de código enquanto o mapeamento por grafo não for feito na sessão. Cai na primeira consulta ao `tokensave` ou ao `code-review-graph`. |
 | **Ferramentas ausentes** | Instala em segundo plano o que faltar, no máximo uma vez por dia. |
 | **ponytail e caveman** | Regras reinjetadas em toda mensagem: solução mais simples que funciona, resposta sem enrolação. |
+| **Documento desatualizado** | Bloqueia encerrar a sessão se o código mudou e o `docs/STATUS.md` não foi atualizado; devolve a matriz de impacto com os demais documentos a revisar. |
 
 **Limite honesto:** as travas cobrem as ferramentas de edição e leitura. Quem escrever código por comando de terminal (`cat > arquivo`, `sed -i`, geradores) passa por fora. Isso é violação da metodologia, não brecha para usar.
 

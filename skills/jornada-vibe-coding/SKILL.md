@@ -51,6 +51,9 @@ A metodologia **não é** "um turno". Depois de ativada, ela vale para **TODOS o
 4. Hook `PreToolUse` em `Read|Grep|Glob` (`scripts/jornada-p1-guard.sh`) **bloqueia a leitura direta de código** até o P1 (mapeamento por grafo) ser feito na sessão; o hook `PostToolUse` (`scripts/jornada-p1-marca.sh`) libera assim que `tokensave` ou `code-review-graph` for usado.
 5. Hook `SessionStart` (`scripts/verificar-ferramentas.sh`) confere as sete ferramentas de economia de tokens e **instala em segundo plano** as que faltarem.
 
+6. Hook `PostToolUse` em `Edit|Write|MultiEdit|NotebookEdit` (`scripts/jornada-registrar-edicao.sh`) anota o que foi alterado na sessão.
+7. Hook `Stop` (`scripts/jornada-stop-guard.sh`) **não deixa encerrar** se houve alteração de código sem `docs/STATUS.md` atualizado — devolve a matriz de impacto e o trabalho continua.
+
 **Limite conhecido:** o guard cobre as ferramentas de edição (`Edit`/`Write`/`MultiEdit`/`NotebookEdit`), **não** cobre escrita via Bash (`cat > arquivo`, `sed -i`, geradores/scaffolds). Escrever código por Bash para contornar o bloqueio é violação da metodologia — não fazer.
 
 **Ao ativar, execute imediatamente:**
@@ -562,6 +565,34 @@ Ordem obrigatória (skill `estruturar-projeto`):
    - (b) O **checklist completo com todas as etapas** de tudo que já foi feito no projeto
 4. **Erros:** Registrar em `docs/ERROS.md` (o que aconteceu em leigo, erro técnico, causa, correção, status). Reusar histórico para não repetir erros.
 5. **Status:** Manter `docs/STATUS.md` sempre atualizado a cada avanço.
+
+---
+
+## MATRIZ DE IMPACTO — que documento atualizar (OBRIGATÓRIA)
+
+Toda alteração de código passa por esta tabela **antes** de a tarefa ser considerada pronta. Não é "se der tempo": é parte da entrega.
+
+| O que você mexeu | Documento que precisa ser atualizado |
+|---|---|
+| Funcionalidade nova, alterada ou removida | `PRD.md` (e `docs/FSD.md`) |
+| Regra de negócio, validação, cálculo, estado | `PRD.md` + `docs/FSD.md` |
+| Entidade, tabela, campo, migration | `docs/FSD.md` (modelo de dados) |
+| Rota, endpoint, tela nova | `docs/FSD.md` |
+| Fluxo do usuário mudou | `PRD.md` + `docs/FSD.md` |
+| Stack, banco, hospedagem, biblioteca nova | `DECISOES_TECNICAS.md` + `INSUMOS.md` |
+| Autenticação, perfil, permissão, sessão | `DECISOES_TECNICAS.md` + `docs/FSD.md` |
+| Variável de ambiente, config, integração externa | `INSUMOS.md` + `DECISOES_TECNICAS.md` |
+| Cor, fonte, espaçamento, componente, padrão visual | `docs/DESIGN.md` |
+| Etapa nova descoberta no caminho | `docs/PLANO.md` |
+| Jeito de rodar, testar ou contribuir mudou | `CLAUDE.md` |
+| Qualquer alteração de código, sempre | `docs/STATUS.md` |
+| Qualquer erro encontrado, mesmo já corrigido | `docs/ERROS.md` |
+
+**Regra de fechamento:** ao terminar a tarefa, diga em uma linha quais documentos foram atualizados e, para os que **não** foram, qual foi conferido e por que não precisou mexer. Silêncio sobre um documento conta como esquecimento, não como "não precisava".
+
+**Trava:** o hook `Stop` não deixa a sessão encerrar se houve alteração de código e o `docs/STATUS.md` não foi atualizado — ele devolve esta matriz e o trabalho continua.
+
+**Não vale o contrário:** não inche o PRD com detalhe de implementação nem o FSD com decisão que não foi tomada. Atualizar é refletir o que mudou, não escrever mais.
 
 ---
 

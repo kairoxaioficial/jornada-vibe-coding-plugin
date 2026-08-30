@@ -39,6 +39,8 @@ UserPromptSubmit||$BASE/jornada-context.sh
 PreToolUse|Edit|Write|MultiEdit|NotebookEdit|$BASE/jornada-guard.sh
 PreToolUse|Read|Grep|Glob|$BASE/jornada-p1-guard.sh
 PostToolUse|mcp__tokensave__.*|mcp__code-review-graph__.*|$BASE/jornada-p1-marca.sh
+PostToolUse|Edit|Write|MultiEdit|NotebookEdit|$BASE/jornada-registrar-edicao.sh
+Stop||$BASE/jornada-stop-guard.sh
 "
 
 TMP="$BACKUP"
@@ -50,11 +52,11 @@ while IFS= read -r linha; do
   matcher="${resto%|*}"
   saida="$CFG.tmp.$$"
   jq --arg ev "$evento" --arg m "$matcher" --arg c "$script" '
-    .hooks //= {}
+    ({type:"command", command:$c, timeout:(if ($c|test("verificar-ferramentas")) then 20 else 10 end)}) as $novo
+    | .hooks //= {}
     | .hooks[$ev] //= []
     | if ([.hooks[$ev][]?.hooks[]?.command] | index($c)) then .
-      else .hooks[$ev] += [ (if $m == "" then {hooks:[{type:"command",command:$c}]}
-                             else {matcher:$m, hooks:[{type:"command",command:$c}]} end) ]
+      else .hooks[$ev] += [ (if $m == "" then {hooks:[$novo]} else {matcher:$m, hooks:[$novo]} end) ]
       end
   ' "$TMP" > "$saida" && mv "$saida" "$CFG"
   TMP="$CFG"

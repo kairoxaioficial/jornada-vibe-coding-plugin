@@ -16,7 +16,8 @@
       "hooks": [
         {
           "type": "command",
-          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-context.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-context.sh",
+          "timeout": 10
         }
       ]
     }
@@ -27,7 +28,8 @@
       "hooks": [
         {
           "type": "command",
-          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-guard.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-guard.sh",
+          "timeout": 10
         }
       ]
     },
@@ -36,7 +38,8 @@
       "hooks": [
         {
           "type": "command",
-          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-p1-guard.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-p1-guard.sh",
+          "timeout": 10
         }
       ]
     }
@@ -47,7 +50,29 @@
       "hooks": [
         {
           "type": "command",
-          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-p1-marca.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-p1-marca.sh",
+          "timeout": 10
+        }
+      ]
+    },
+    {
+      "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-registrar-edicao.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/skills/jornada-vibe-coding/scripts/jornada-stop-guard.sh",
+          "timeout": 10
         }
       ]
     }

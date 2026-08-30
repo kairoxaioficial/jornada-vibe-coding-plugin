@@ -142,3 +142,19 @@ NUNCA comprimir o que fica gravado: documentos da metodologia (PRD, FSD, STATUS,
 Responder sempre no idioma do usuario.
 REGRAS
 }
+
+# --- registro de edicoes da sessao (para cobrar atualizacao dos documentos) ---
+jornada_edits_file() {
+  local session="$1" root="$2"
+  mkdir -p "$JORNADA_HOME/edits" 2>/dev/null
+  printf '%s' "$JORNADA_HOME/edits/$(jornada_slug "${session:-sem-sessao}--$root")"
+}
+
+# Documentos da metodologia (para nao contar como "codigo alterado").
+jornada_is_doc_metodologia() {
+  case "$1" in
+    */PRD.md|PRD.md|*/DECISOES_TECNICAS.md|DECISOES_TECNICAS.md|*/INSUMOS.md|INSUMOS.md|\
+    */CLAUDE.md|CLAUDE.md|*/docs/FSD.md|*/docs/DESIGN.md|*/docs/PLANO.md|*/docs/STATUS.md|*/docs/ERROS.md|*/docs/MANUTENCAO.md) return 0 ;;
+  esac
+  return 1
+}
