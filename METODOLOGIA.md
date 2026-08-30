@@ -192,16 +192,27 @@ Isto não depende de a IA lembrar das regras. São hooks que rodam por fora e po
 
 ## Projeto que já existe (cold start)
 
-Se você ligar a metodologia em um projeto que já tem código e nenhum documento:
+É a situação mais comum: você já tem um sistema rodando e quer colocá-lo na metodologia. Nesse primeiro momento, a IA **lê o projeto inteiro** para escrever os documentos — porque os documentos vão descrever o sistema todo, e um PRD escrito a partir de meia dúzia de arquivos fica errado.
 
-1. A IA mapeia o sistema inteiro pelo grafo (não lendo arquivo por arquivo).
-2. Cria todos os documentos a partir do que **realmente existe** no código — PRD, FSD, decisões técnicas, design, insumos, `CLAUDE.md`.
-3. `STATUS.md` e `ERROS.md` nascem vazios, porque nada foi feito ainda sob a metodologia.
-4. Só então lê o seu pedido, registra no plano e começa a trabalhar.
+Ordem do que acontece:
 
-É o que o comando `/estruturar-projeto` faz.
+**1. Inventário.** Um script lista tudo que existe: quantos arquivos, quais pastas, quais manifestos, todas as migrations, todas as rotas e telas, os arquivos de autenticação e permissão, os testes, as variáveis de ambiente, as integrações externas e os `TODO` já marcados no código. Essa lista vira a **verificação**: nada é escrito antes de tudo nela estar coberto.
 
----
+**2. Mapa pelo grafo.** As entidades, os módulos, os fluxos ponta a ponta e o que é central no sistema saem do grafo de código — barato e cobre muita coisa.
+
+**3. Leitura direta do que o grafo não enxerga.** Grafo entende código, mas não lê regra de negócio escrita em texto. São de leitura obrigatória e completa: manifestos da stack, `.env.example`, **todas** as migrations, todas as rotas e telas, middleware e permissões, README e documentos soltos, configuração de deploy.
+
+**4. Módulo por módulo.** Para cada um, seis perguntas: o que faz (em linguagem de negócio), que dados toca, que telas expõe, que regras aplica, de quem depende e quem depende dele, e se tem teste. Módulo muito grande é delegado a um assistente auxiliar, que devolve só as respostas.
+
+**5. Tabela de cobertura — você vê antes dos documentos.** Uma tabela com toda pasta do projeto: como foi coberta, o que faz, que entidades toca e o que ficou em aberto. As pastas descartadas aparecem também, com o motivo ("assets estáticos", "gerado automaticamente"). Se a tabela não bate com o inventário, a leitura não terminou.
+
+**6. Só então os documentos.** PRD, decisões técnicas, FSD, design, insumos e `CLAUDE.md` — com cada afirmação apontando de onde saiu no código. O que não deu para descobrir vira `PENDENTE — confirmar com o usuário`, nunca um chute. `STATUS.md` e `ERROS.md` nascem vazios, porque nada foi feito ainda sob a metodologia.
+
+**7. Aí sim o seu pedido.** Ele é relido, registrado no plano e executado etapa por etapa.
+
+Duas coisas valem ao mesmo tempo aqui, e não se contradizem: **cobrir 100% do projeto é obrigatório** e **gastar token à toa não é permitido**. Cobertura total pelo caminho mais barato — grafo primeiro, leitura direta onde o grafo não alcança, subagente quando o módulo é grande.
+
+É isso que o comando `/estruturar-projeto` faz.
 
 ## Economia de tokens em cada passo
 

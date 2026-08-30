@@ -69,6 +69,19 @@ Dentro do Claude Code, digite:
 
 Depois reinicie o Claude Code.
 
+## Primeira vez num projeto que já tem código
+
+A IA **lê o projeto inteiro** antes de escrever qualquer documento — nada de amostra. O comando `/estruturar-projeto` executa:
+
+1. `scripts/inventario-projeto.sh` — lista tudo que precisa ser coberto: arquivos por extensão, pastas, manifestos, todas as migrations, todas as rotas e telas, autenticação, testes, variáveis de ambiente, integrações e `TODO`/`FIXME`.
+2. Mapa pelo grafo (`tokensave` + `code-review-graph`, em paralelo).
+3. Leitura direta obrigatória onde o grafo não alcança: manifestos, `.env.example`, migrations, rotas, middleware e permissões, README, configuração de deploy.
+4. Módulo por módulo, seis perguntas cada; módulo grande vai para subagente.
+5. **Tabela de cobertura** entregue antes dos documentos — toda pasta do inventário aparece, inclusive as descartadas com o motivo.
+6. Só então PRD, DECISOES_TECNICAS, FSD, DESIGN, INSUMOS e `CLAUDE.md`, com cada afirmação apontando a origem no código. O que não der para inferir vira `PENDENTE — confirmar com o usuário`. `STATUS.md` e `ERROS.md` nascem vazios.
+
+Cobrir 100% do projeto é obrigatório; gastar token à toa não é permitido. As duas regras valem juntas — grafo primeiro, leitura direta onde ele não chega.
+
 ## Como usar
 
 | Comando | O que faz |

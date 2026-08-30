@@ -524,13 +524,20 @@ Privada → GitHub Secret `HOSTNET_SSH_KEY`; Pública → servidor `authorized_k
 3. Executar **Deploy** (Passo 7) se solicitado — chat novo com raciocínio
 
 ### Cold Start — Sistema SEM arquivos da metodologia
-Se o projeto NÃO tem PRD/FSD/insumos/etc.:
-1. **Ler TODO o código e funcionalidades existentes** (mapear rotas, entidades, telas, fluxos)
-2. **Criar toda a estrutura e arquivos:** `PRD.md`, `DECISOES_TECNICAS.md`, `FSD.md`, `INSUMOS.md`, `docs/PLANO.md`, `docs/STATUS.md` (**obviamente VAZIO nesse primeiro momento**), `docs/ERROS.md`, `CLAUDE.md` — preenchidos a partir do código lido
-3. **Reler o comando do usuário**, atualizar STATUS e demais arquivos com a tarefa atual
-4. Seguir o plano com a metodologia, etapa por etapa
 
----
+Primeira vez num projeto que já tem código: os documentos vão descrever o sistema inteiro, então a leitura cobre o sistema inteiro. **Amostra não serve** — PRD e FSD escritos a partir de "alguns arquivos representativos" ficam errados, e o erro só aparece depois, quando alguém já confiou neles.
+
+Ordem obrigatória (skill `estruturar-projeto`):
+
+1. **Inventário** — `bash scripts/inventario-projeto.sh` na raiz. Devolve arquivos por extensão, pastas com contagem, manifestos, migrations, rotas, autenticação, testes, variáveis de ambiente, integrações e `TODO`/`FIXME`. É a lista de verificação.
+2. **Grafo** — `tokensave` (`_entities`, `_files`, `_module_api`, `_dependencies`, `_rank`) + `code-review-graph` (`get_architecture_overview_tool`, `list_communities_tool`, `list_flows_tool`, `get_hub_nodes_tool`), em paralelo.
+3. **Leitura direta obrigatória** onde o grafo não alcança: manifestos, `.env.example`, **todas** as migrations e schemas, todas as rotas e telas, middleware/policies/permissões, README e docs soltos, configuração de deploy.
+4. **Módulo por módulo**, na ordem de importância, respondendo seis perguntas: o que faz (em linguagem de negócio), que entidades toca, que telas/endpoints expõe, que regras aplica, de quem depende e quem depende dele, e se tem teste. Módulo grande → subagente.
+5. **Tabela de cobertura**, entregue **antes** dos documentos: pasta/módulo → como foi coberto → o que faz → entidades → pendências. Toda pasta do inventário aparece, inclusive as descartadas com o motivo. Tabela que não fecha com o inventário = varredura incompleta.
+6. **Só então** escrever PRD, DECISOES_TECNICAS, FSD, DESIGN, INSUMOS e `CLAUDE.md` — cada afirmação apontando a origem no código. `STATUS.md` e `ERROS.md` nascem vazios.
+7. Reler o comando original do usuário, registrar em `PLANO.md` + `STATUS.md`, e seguir a metodologia.
+
+**Cobertura total, custo mínimo:** cobrir 100% dos módulos é obrigatório; fazer isso lendo arquivo inteiro quando o grafo resolvia, não. As duas coisas valem ao mesmo tempo.
 
 ## VOCABULÁRIO ESPECIALIZADO (uso obrigatório para precisão)
 

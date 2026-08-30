@@ -3,3 +3,4 @@ node_modules/
 *.zip
 # Added by code-review-graph
 .code-review-graph/
+.claude/
