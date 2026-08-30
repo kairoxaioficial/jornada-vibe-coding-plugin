@@ -1,0 +1,11 @@
+{
+  "name": "jornada",
+  "owner": { "name": "Adriel" },
+  "plugins": [
+    {
+      "name": "jornada-vibe-coding",
+      "source": "./",
+      "description": "Metodologia Jornada IA Vibe Coding (skills jornada-vibe-coding + estruturar-projeto, com hooks de sessao)."
+    }
+  ]
+}

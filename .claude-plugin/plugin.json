@@ -1,0 +1,7 @@
+{
+  "name": "jornada-vibe-coding",
+  "description": "Metodologia de desenvolvimento Jornada IA Vibe Coding: PRD, Decisoes Tecnicas, FSD, STATUS, ERROS, etapas com teste e checklists em linguagem leiga.",
+  "version": "1.0.0",
+  "author": { "name": "Adriel" },
+  "keywords": ["metodologia", "prd", "fsd", "vibe-coding", "documentacao", "pt-br"]
+}
