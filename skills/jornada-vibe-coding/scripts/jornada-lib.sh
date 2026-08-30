@@ -64,3 +64,58 @@ jornada_is_exempt_path() {
   esac
   return 1
 }
+
+# Raiz do plugin (contem scripts/instalar-ferramentas.sh).
+jornada_plugin_root() {
+  if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -f "$CLAUDE_PLUGIN_ROOT/scripts/instalar-ferramentas.sh" ]; then
+    printf '%s' "$CLAUDE_PLUGIN_ROOT"; return 0
+  fi
+  local d
+  d="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." 2>/dev/null && pwd)"
+  [ -f "$d/scripts/instalar-ferramentas.sh" ] && printf '%s' "$d"
+}
+
+# Ferramentas obrigatorias de linha de comando presentes?
+jornada_ferramentas_faltando() {
+  local falta="" c
+  for c in tokensave rtk code-review-graph graphify; do
+    command -v "$c" >/dev/null 2>&1 || falta="$falta $c"
+  done
+  command -v tokenoptim >/dev/null 2>&1 || command -v llm-tokenoptim >/dev/null 2>&1 || falta="$falta tokenoptim"
+  printf '%s' "${falta# }"
+}
+
+# Instala em segundo plano o que faltar. Roda no maximo 1x por dia.
+jornada_garantir_ferramentas() {
+  [ -n "$(jornada_ferramentas_faltando)" ] || return 0
+  local raiz marca hoje
+  raiz="$(jornada_plugin_root)"; [ -n "$raiz" ] || return 0
+  mkdir -p "$JORNADA_HOME" 2>/dev/null
+  marca="$JORNADA_HOME/ultima-instalacao"
+  hoje="$(date +%Y-%m-%d)"
+  [ -f "$marca" ] && [ "$(cat "$marca" 2>/dev/null)" = "$hoje" ] && return 0
+  printf '%s' "$hoje" > "$marca"
+  nohup bash "$raiz/scripts/instalar-ferramentas.sh" >"$JORNADA_HOME/instalacao.log" 2>&1 &
+  return 0
+}
+
+# --- P1: mapeamento com grafo feito nesta sessao/projeto? ---
+jornada_p1_marca() {
+  local session="$1" root="$2"
+  mkdir -p "$JORNADA_HOME/p1" 2>/dev/null
+  : > "$JORNADA_HOME/p1/$(jornada_slug "${session:-sem-sessao}--$root")"
+}
+
+jornada_p1_feito() {
+  local session="$1" root="$2"
+  [ -f "$JORNADA_HOME/p1/$(jornada_slug "${session:-sem-sessao}--$root")" ]
+}
+
+# Arquivo de codigo? (documentos e configs nao contam)
+jornada_is_codigo() {
+  case "$1" in
+    *.md|*.txt|*.json|*.yml|*.yaml|*.toml|*.ini|*.env|*.env.*|*.lock|*.csv|*.svg|*.png|*.jpg|*.jpeg|*.gif|*.pdf) return 1 ;;
+    *.*) return 0 ;;
+  esac
+  return 1
+}

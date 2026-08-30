@@ -8,6 +8,10 @@ cat >/dev/null 2>&1   # descarta o payload do hook
 RAIZ="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 tem() { command -v "$1" >/dev/null 2>&1; }
 
+# Instala em segundo plano o que estiver faltando (no maximo 1x por dia).
+LIB="$RAIZ/skills/jornada-vibe-coding/scripts/jornada-lib.sh"
+if [ -f "$LIB" ]; then . "$LIB"; jornada_garantir_ferramentas 2>/dev/null || true; fi
+
 disp=""; falta=""
 add() { if tem "$1"; then disp="$disp $1"; else falta="$falta $1"; fi; }
 add tokensave
@@ -38,7 +42,8 @@ Regras obrigatorias enquanto trabalhar neste projeto:
 - Perguntas sobre a arquitetura do projeto: consultar graphify (graphify-out/) antes de ler arquivos.
 - Saida: manter respostas comprimidas (caveman) sem perder codigo, caminhos, comandos e mensagens de erro.
 
-Se alguma ferramenta estiver AUSENTE e for necessaria para a tarefa, INSTALE antes de continuar rodando:
+As ferramentas de linha de comando ausentes ja estao sendo instaladas em segundo plano
+(log: ~/.claude/jornada/instalacao.log). Para forcar agora:
   bash \"$RAIZ/scripts/instalar-ferramentas.sh\"
 Os plugins ponytail e caveman precisam ser instalados dentro do Claude Code:
   /plugin marketplace add DietrichGebert/ponytail

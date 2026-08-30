@@ -58,7 +58,9 @@ bash scripts/instalar-ferramentas.sh --check
 /plugin install caveman@caveman
 ```
 
-Se algo falhar aqui, não tem problema: toda vez que você abrir o Claude Code, o plugin confere o que está faltando e ele mesmo se oferece para instalar antes de começar a trabalhar.
+Se algo falhar aqui, não tem problema: **o plugin baixa sozinho**. Toda vez que você abre o Claude Code, ou liga a metodologia, ele confere o que falta e instala em segundo plano (no máximo uma vez por dia). O que ele não consegue fazer sozinho são os dois plugins acima, porque só o Claude Code instala plugin.
+
+Enquanto a metodologia estiver ligada, o Claude fica **proibido** de ler o código arquivo por arquivo antes de mapear o projeto pelo grafo — é o que faz a economia acontecer de verdade, sem depender de ele lembrar.
 
 ## Como saber se funcionou
 

@@ -29,7 +29,7 @@ Todo pedido de CRIAR, ALTERAR ou IMPLEMENTAR algo segue este fluxo.
 - `references/ferramentas-token.md` — ferramentas obrigatórias de economia de tokens (o que são, como instalar, quando usar)
 - `references/sintese-executiva.md` — visão geral consolidada do fluxo
 **Templates de documentos:** `templates/` (PRD, DESIGN, DECISOES_TECNICAS, FSD, INSUMOS, PLANO, STATUS, ERROS, CHECKLIST, CLAUDE.md)
-**Scripts do modo sessão:** `scripts/` (`jornada-context.sh`, `jornada-guard.sh`, `jornada-session.sh`, `jornada-lib.sh`)
+**Scripts do modo sessão:** `scripts/` (`jornada-context.sh`, `jornada-guard.sh`, `jornada-p1-guard.sh`, `jornada-p1-marca.sh`, `jornada-session.sh`, `jornada-lib.sh`)
 
 ---
 
@@ -47,6 +47,9 @@ A metodologia **não é** "um turno". Depois de ativada, ela vale para **TODOS o
 3. Hook `PreToolUse` em `Edit|Write|MultiEdit|NotebookEdit` (`scripts/jornada-guard.sh`) **bloqueia edição de código** enquanto faltar `PRD.md`, `docs/FSD.md`, `docs/PLANO.md`, `docs/STATUS.md`, `docs/ERROS.md` — e **bloqueia sempre a criação de `AGENTS.md`**.
    - Documentos, `docs/`, `.github/`, `.claude/`, README, `.gitignore`, `.gitattributes` passam sempre (é o que precisa vir antes).
    - Isentos de bloqueio: `$HOME` puro, `~/.claude`, `~/.config`, `/tmp`, `/private/tmp`.
+
+4. Hook `PreToolUse` em `Read|Grep|Glob` (`scripts/jornada-p1-guard.sh`) **bloqueia a leitura direta de código** até o P1 (mapeamento por grafo) ser feito na sessão; o hook `PostToolUse` (`scripts/jornada-p1-marca.sh`) libera assim que `tokensave` ou `code-review-graph` for usado.
+5. Hook `SessionStart` (`scripts/verificar-ferramentas.sh`) confere as sete ferramentas de economia de tokens e **instala em segundo plano** as que faltarem.
 
 **Limite conhecido:** o guard cobre as ferramentas de edição (`Edit`/`Write`/`MultiEdit`/`NotebookEdit`), **não** cobre escrita via Bash (`cat > arquivo`, `sed -i`, geradores/scaffolds). Escrever código por Bash para contornar o bloqueio é violação da metodologia — não fazer.
 
@@ -569,22 +572,45 @@ Estas sete ferramentas são **parte da metodologia**, não um extra. Usar sempre
 | 6 | **ponytail** (plugin) | Força a solução mais simples que funciona (anti-over-engineering) | https://github.com/dietrichgebert/ponytail |
 | 7 | **caveman** (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
 
-### P0 — Verificar e instalar antes de trabalhar (obrigatório)
+### P0 — Instalação automática (não depende do modelo)
 
-No começo de qualquer trabalho num projeto:
+Ao ativar a metodologia e a cada início de sessão, os hooks do plugin fazem sozinhos:
 
-1. Rodar `bash scripts/instalar-ferramentas.sh --check` (na raiz deste plugin).
-2. Se faltar alguma ferramenta de linha de comando, **instalar antes de continuar**: `bash scripts/instalar-ferramentas.sh`.
-3. Se faltarem os plugins `ponytail` ou `caveman`, avisar o usuário e pedir que cole no Claude Code:
-   ```
-   /plugin marketplace add DietrichGebert/ponytail
-   /plugin install ponytail@ponytail
-   /plugin marketplace add JuliusBrussee/caveman
-   /plugin install caveman@caveman
-   ```
-4. Só depois seguir para P1.
+1. Verificam as sete ferramentas.
+2. **Baixam e instalam em segundo plano** as de linha de comando que faltarem (`tokensave`, `rtk`, `code-review-graph`, `graphify`, `tokenoptim`), no máximo uma vez por dia. Log: `~/.claude/jornada/instalacao.log`.
+3. Injetam no contexto quais estão disponíveis e quais faltam.
 
-O hook `SessionStart` do plugin já reporta, a cada sessão, quais ferramentas estão presentes e quais faltam. Detalhes de uso por ferramenta: `references/ferramentas-token.md`.
+O que **você** (modelo) ainda precisa fazer:
+
+- Se faltarem os plugins `ponytail` ou `caveman`, pedir ao usuário que cole no Claude Code:
+  ```
+  /plugin marketplace add DietrichGebert/ponytail
+  /plugin install ponytail@ponytail
+  /plugin marketplace add JuliusBrussee/caveman
+  /plugin install caveman@caveman
+  ```
+- Se `tokensave` estiver instalado mas o projeto não tiver índice, rodar `tokensave init .`.
+
+Detalhes de uso por ferramenta: `references/ferramentas-token.md`.
+
+### Uso obrigatório em TODO passo — garantido por hook
+
+O hook `PreToolUse` em `Read|Grep|Glob` **bloqueia a leitura direta de arquivos de código** enquanto o P1 não for feito na sessão. O bloqueio cai assim que qualquer ferramenta `mcp__tokensave__*` ou `mcp__code-review-graph__*` for chamada (registrado pelo hook `PostToolUse`). Documentos (`.md`), configs (`.json`, `.yml`, `.toml`, `.env`) e imagens passam sempre — são o que a metodologia precisa ler primeiro.
+
+Ou seja: em toda sessão, em todo projeto, o mapeamento por grafo vem antes da leitura bruta. Não é uma recomendação, é uma trava.
+
+| Passo da metodologia | Ferramenta obrigatória |
+|---|---|
+| Explorar ideia / insumos do cliente (PDF, transcrição, documentação) | `graphify` |
+| Mapear sistema existente (PRD, FSD, cold start) | `tokensave` (`_context`, `_entities`, `_files`) |
+| Decisões técnicas / arquitetura | `code-review-graph` (`get_architecture_overview_tool`, `list_flows_tool`) |
+| Planejar etapa (PLANO/STATUS) | `tokensave` (`_impact`, `_affected`) + `code-review-graph` (`get_impact_radius_tool`) |
+| Codificar a etapa | `ponytail` (solução mais simples) |
+| Testar / rodar comandos | `rtk` (filtra a saída automaticamente) |
+| Revisar a etapa | `code-review-graph` (`detect_changes_tool`, `get_review_context_tool`) |
+| Revisão de segurança | `code-review-graph` (`get_impact_radius_tool`) + `tokensave` (`_callers`) |
+| Relatar / checklists / commit | `caveman` (comprimido; nunca comprimir código, caminhos, comandos e erros) |
+| Contexto ou prompt muito longo | `tokenoptim` |
 
 ### Ordem padrão de leitura do sistema (P1)
 

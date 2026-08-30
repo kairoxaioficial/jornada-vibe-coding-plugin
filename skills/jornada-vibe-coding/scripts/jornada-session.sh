@@ -11,6 +11,7 @@ root="$(jornada_root "$target")"
 case "$action" in
   on|ativar)
     jornada_activate "" "$root"
+    jornada_garantir_ferramentas
     echo "jornada: ATIVA em $root"
     ;;
   off|desativar)
