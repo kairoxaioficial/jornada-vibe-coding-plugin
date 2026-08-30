@@ -10,7 +10,7 @@ tem() { command -v "$1" >/dev/null 2>&1; }
 
 # Instala em segundo plano o que estiver faltando (no maximo 1x por dia).
 LIB="$RAIZ/skills/jornada-vibe-coding/scripts/jornada-lib.sh"
-if [ -f "$LIB" ]; then . "$LIB"; jornada_garantir_ferramentas 2>/dev/null || true; fi
+if [ -f "$LIB" ]; then . "$LIB"; jornada_garantir_ferramentas 2>/dev/null || true; jornada_ativar_caveman 2>/dev/null || true; fi
 
 disp=""; falta=""
 add() { if tem "$1"; then disp="$disp $1"; else falta="$falta $1"; fi; }
@@ -29,6 +29,10 @@ for pl in ponytail caveman; do
   fi
 done
 
+regras=""
+command -v jornada_regras_sempre_ativas >/dev/null 2>&1 || true
+type jornada_regras_sempre_ativas >/dev/null 2>&1 && regras="$(jornada_regras_sempre_ativas)"
+
 ctx="FERRAMENTAS DE ECONOMIA DE TOKENS (Jornada IA Vibe Coding) — USO OBRIGATORIO.
 Disponiveis:${disp:- nenhuma}.
 Ausentes:${falta:- nenhuma}.
@@ -40,7 +44,9 @@ Regras obrigatorias enquanto trabalhar neste projeto:
 - Escrever codigo: aplicar a skill ponytail (solucao mais simples que funciona, sem over-engineering).
 - Terminal: rtk filtra a saida automaticamente; nunca contornar com 'rtk proxy'.
 - Perguntas sobre a arquitetura do projeto: consultar graphify (graphify-out/) antes de ler arquivos.
-- Saida: manter respostas comprimidas (caveman) sem perder codigo, caminhos, comandos e mensagens de erro.
+- Combinar varias ferramentas no MESMO passo (chamadas em paralelo na mesma mensagem) sempre que possivel — economiza mais que usar uma de cada vez.
+
+$regras
 
 As ferramentas de linha de comando ausentes ja estao sendo instaladas em segundo plano
 (log: ~/.claude/jornada/instalacao.log). Para forcar agora:

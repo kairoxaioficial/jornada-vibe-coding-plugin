@@ -62,6 +62,8 @@ Se algo falhar aqui, não tem problema: **o plugin baixa sozinho**. Toda vez que
 
 Enquanto a metodologia estiver ligada, o Claude fica **proibido** de ler o código arquivo por arquivo antes de mapear o projeto pelo grafo — é o que faz a economia acontecer de verdade, sem depender de ele lembrar.
 
+Duas dessas ferramentas ficam **sempre ligadas**, em toda resposta: o *ponytail* (obriga a solução mais simples que funciona) e o *caveman* (deixa as respostas curtas e diretas). Os documentos da metodologia, os checklists e as mensagens de commit continuam escritos em português normal, por extenso — só a conversa fica mais enxuta.
+
 ## Como saber se funcionou
 
 Digite `/jornada-vibe-coding` no Claude Code. Se a metodologia ligar e ele responder sobre o protocolo de fases, está tudo certo.

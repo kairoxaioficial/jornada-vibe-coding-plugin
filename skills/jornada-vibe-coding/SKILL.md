@@ -599,18 +599,29 @@ O hook `PreToolUse` em `Read|Grep|Glob` **bloqueia a leitura direta de arquivos 
 
 Ou seja: em toda sessão, em todo projeto, o mapeamento por grafo vem antes da leitura bruta. Não é uma recomendação, é uma trava.
 
-| Passo da metodologia | Ferramenta obrigatória |
+**Não é uma ferramenta por passo — é todas as que couberem.** Chamadas independentes vão na mesma mensagem, em paralelo: duas consultas de grafo juntas custam menos que ler um arquivo.
+
+| Passo da metodologia | Ferramentas a combinar |
 |---|---|
-| Explorar ideia / insumos do cliente (PDF, transcrição, documentação) | `graphify` |
-| Mapear sistema existente (PRD, FSD, cold start) | `tokensave` (`_context`, `_entities`, `_files`) |
-| Decisões técnicas / arquitetura | `code-review-graph` (`get_architecture_overview_tool`, `list_flows_tool`) |
-| Planejar etapa (PLANO/STATUS) | `tokensave` (`_impact`, `_affected`) + `code-review-graph` (`get_impact_radius_tool`) |
-| Codificar a etapa | `ponytail` (solução mais simples) |
-| Testar / rodar comandos | `rtk` (filtra a saída automaticamente) |
-| Revisar a etapa | `code-review-graph` (`detect_changes_tool`, `get_review_context_tool`) |
-| Revisão de segurança | `code-review-graph` (`get_impact_radius_tool`) + `tokensave` (`_callers`) |
-| Relatar / checklists / commit | `caveman` (comprimido; nunca comprimir código, caminhos, comandos e erros) |
+| Explorar ideia / insumos do cliente (PDF, transcrição, documentação) | `graphify` + `tokenoptim` (comprimir o insumo antes de processar) |
+| Mapear sistema existente (cold start, PRD, FSD) | `tokensave` (`_context`, `_entities`, `_files`) **+** `code-review-graph` (`get_architecture_overview_tool`, `list_flows_tool`) — em paralelo |
+| Decisões técnicas / arquitetura | `code-review-graph` (arquitetura, comunidades, hubs) **+** `tokensave` (`_dependencies`, `_imports`) |
+| Planejar etapa (PLANO/STATUS) | `tokensave` (`_impact`, `_affected`, `_callers`) **+** `code-review-graph` (`get_impact_radius_tool`, `get_affected_flows_tool`) **+** `graphify` se houver `graphify-out/` |
+| Codificar a etapa | `ponytail` (sempre) **+** `tokensave` (`_body`, `_signature`, `_str_replace`) no lugar de `Read`/`Edit` de arquivo inteiro |
+| Testar / rodar comandos | `rtk` (automático) **+** `tokensave` (`_run_affected_tests`, `_test_map`) para rodar só o que importa |
+| Revisar a etapa | `code-review-graph` (`detect_changes_tool`, `get_review_context_tool`) **+** `tokensave` (`_diff_context`) |
+| Revisão de segurança | `code-review-graph` (`get_impact_radius_tool`) **+** `tokensave` (`_callers`, `_unsafe_patterns`) |
+| Busca ampla em muitos arquivos | subagente (`Explore` / `cavecrew-investigator`) — nunca no contexto principal |
+| Relatar / checklists / commit | `caveman` (sempre) — comprime a conversa, **nunca** o documento nem a mensagem de commit |
 | Contexto ou prompt muito longo | `tokenoptim` |
+
+### ponytail e caveman: sempre ligados
+
+Não são opcionais nem "quando der". Os hooks do plugin injetam as duas regras em **todo prompt**, mesmo que os plugins ainda não estejam instalados — e o hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir.
+
+**ponytail** — escada obrigatória antes de escrever qualquer linha: a tarefa precisa existir? já existe no projeto? resolve com recurso nativo? com dependência já instalada? em uma linha? só então o mínimo que funciona. Nunca cortar validação, tratamento de erro, segurança ou acessibilidade.
+
+**caveman** — resposta comprimida: sem preâmbulo, sem resumo final, sem narrar tool call. **Nunca** comprimir código, comandos, caminhos, erros, números, versões e avisos de segurança. **Nunca** comprimir o que fica gravado: PRD, FSD, STATUS, ERROS, PLANO, checklists em linguagem leiga e mensagens de commit saem em português normal, por extenso.
 
 ### Ordem padrão de leitura do sistema (P1)
 

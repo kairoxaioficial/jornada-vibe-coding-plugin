@@ -51,7 +51,8 @@ Não depende de o Claude "lembrar":
 
 - **Baixa sozinho.** Ao ativar a metodologia e a cada início de sessão, o plugin verifica as cinco ferramentas de linha de comando e instala em segundo plano as que faltarem (no máximo uma vez por dia). Log em `~/.claude/jornada/instalacao.log`.
 - **Obriga o uso em todo passo.** Enquanto a metodologia estiver ativa, ler código direto (`Read`, `Grep`, `Glob`) fica **bloqueado** até o mapeamento pelo grafo ser feito. A trava cai na primeira chamada de `tokensave` ou `code-review-graph` na sessão. Documentos, configs e imagens passam sempre.
-- **Uma ferramenta por passo**, documentado em `skills/jornada-vibe-coding/SKILL.md`: insumos → `graphify`; mapear → `tokensave`; arquitetura e impacto → `code-review-graph`; codificar → `ponytail`; terminal → `rtk`; relatar → `caveman`; contexto longo → `tokenoptim`.
+- **ponytail e caveman ficam sempre ligados.** As regras dos dois são injetadas em todo prompt pelos hooks — funcionam mesmo antes de os plugins serem instalados. O nível do caveman (`full`) é gravado automaticamente em `~/.claude/.caveman-active` se ainda não existir.
+- **Várias ferramentas por passo, não uma.** Consultas independentes vão na mesma mensagem, em paralelo — duas consultas de grafo custam menos que ler um arquivo. A tabela de combinações por passo está em `skills/jornada-vibe-coding/SKILL.md`.
 
 As regras de uso de cada ferramenta estão em `skills/jornada-vibe-coding/references/ferramentas-token.md`.
 

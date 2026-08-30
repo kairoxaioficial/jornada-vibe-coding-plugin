@@ -119,3 +119,26 @@ jornada_is_codigo() {
   esac
   return 1
 }
+
+# --- ponytail + caveman: SEMPRE ativos ---
+# Garante o arquivo de estado do caveman (o plugin le o nivel dali).
+jornada_ativar_caveman() {
+  local f="$HOME/.claude/.caveman-active"
+  [ -f "$f" ] || { mkdir -p "$HOME/.claude" 2>/dev/null; printf 'full' > "$f" 2>/dev/null; }
+  return 0
+}
+
+# Regras de ponytail e caveman em texto, injetadas em todo prompt.
+# Funcionam mesmo se os plugins ainda nao estiverem instalados.
+jornada_regras_sempre_ativas() {
+  cat <<'REGRAS'
+PONYTAIL (SEMPRE ATIVO) — escada obrigatoria antes de escrever qualquer codigo:
+1 a tarefa precisa existir? 2 ja existe no projeto? 3 resolve com recurso nativo da linguagem/plataforma? 4 resolve com dependencia ja instalada? 5 resolve em uma linha? 6 so entao o minimo que funciona.
+Nunca cortar validacao, tratamento de erro, seguranca ou acessibilidade. Nao adicionar dependencia, abstracao, camada, config ou arquivo que a tarefa nao exigiu.
+
+CAVEMAN (SEMPRE ATIVO, nivel full) — saida comprimida: sem preambulo, sem resumo final, sem "vou fazer", sem narrar tool call, sem elogio, sem emoji decorativo. Fragmentos ok. Resultado primeiro.
+NUNCA comprimir: codigo, comandos, caminhos de arquivo, mensagens de erro, numeros, versoes, avisos de seguranca.
+NUNCA comprimir o que fica gravado: documentos da metodologia (PRD, FSD, STATUS, ERROS, PLANO), checklists em linguagem leiga e mensagens de commit sao escritos em portugues normal, por extenso.
+Responder sempre no idioma do usuario.
+REGRAS
+}

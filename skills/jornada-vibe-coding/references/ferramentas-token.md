@@ -141,6 +141,14 @@ Regra: comprime a conversa, **nunca** o conteúdo técnico. Código, caminhos de
 
 ---
 
+## ponytail e caveman ficam sempre ligados
+
+Os hooks do plugin injetam as regras dos dois em todo prompt, mesmo antes de os plugins estarem instalados, e gravam `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir. Instalar os plugins melhora (eles trazem as sub-skills), mas não é o que garante a ativação.
+
+## Combine ferramentas no mesmo passo
+
+Não use uma ferramenta por vez. Chamadas independentes vão juntas, na mesma mensagem: `tokensave_context` + `get_architecture_overview_tool` em paralelo custa menos que ler um único arquivo grande. A tabela de combinações por passo da metodologia está no `SKILL.md`.
+
 ## Ordem prática numa tarefa
 
 1. `instalar-ferramentas.sh --check` — ferramentas no lugar.
