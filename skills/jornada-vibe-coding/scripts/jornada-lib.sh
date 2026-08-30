@@ -66,13 +66,13 @@ jornada_is_exempt_path() {
 }
 
 # Raiz do plugin (contem scripts/instalar-ferramentas.sh).
-jornada_plugin_root() {
-  if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -f "$CLAUDE_PLUGIN_ROOT/scripts/instalar-ferramentas.sh" ]; then
-    printf '%s' "$CLAUDE_PLUGIN_ROOT"; return 0
-  fi
+jornada_instalador() {
   local d
-  d="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." 2>/dev/null && pwd)"
-  [ -f "$d/scripts/instalar-ferramentas.sh" ] && printf '%s' "$d"
+  d="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+  [ -f "$d/instalar-ferramentas.sh" ] && { printf '%s' "$d/instalar-ferramentas.sh"; return 0; }
+  [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -f "$CLAUDE_PLUGIN_ROOT/scripts/instalar-ferramentas.sh" ] && \
+    { printf '%s' "$CLAUDE_PLUGIN_ROOT/scripts/instalar-ferramentas.sh"; return 0; }
+  return 1
 }
 
 # Ferramentas obrigatorias de linha de comando presentes?
@@ -88,14 +88,14 @@ jornada_ferramentas_faltando() {
 # Instala em segundo plano o que faltar. Roda no maximo 1x por dia.
 jornada_garantir_ferramentas() {
   [ -n "$(jornada_ferramentas_faltando)" ] || return 0
-  local raiz marca hoje
-  raiz="$(jornada_plugin_root)"; [ -n "$raiz" ] || return 0
+  local inst marca hoje
+  inst="$(jornada_instalador)" || return 0
   mkdir -p "$JORNADA_HOME" 2>/dev/null
   marca="$JORNADA_HOME/ultima-instalacao"
   hoje="$(date +%Y-%m-%d)"
   [ -f "$marca" ] && [ "$(cat "$marca" 2>/dev/null)" = "$hoje" ] && return 0
   printf '%s' "$hoje" > "$marca"
-  nohup bash "$raiz/scripts/instalar-ferramentas.sh" >"$JORNADA_HOME/instalacao.log" 2>&1 &
+  nohup bash "$inst" >"$JORNADA_HOME/instalacao.log" 2>&1 &
   return 0
 }
 

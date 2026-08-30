@@ -68,6 +68,10 @@ Duas dessas ferramentas ficam **sempre ligadas**, em toda resposta: o *ponytail*
 
 Digite `/jornada-vibe-coding` no Claude Code. Se a metodologia ligar e ele responder sobre o protocolo de fases, está tudo certo.
 
+## E agora, como uso?
+
+Leia o **[METODOLOGIA.md](METODOLOGIA.md)** — ele explica, passo a passo e em linguagem simples, o que acontece do começo ao fim: as duas fases, os documentos criados, o que você aprova em cada etapa e o que a IA entrega no final de cada uma.
+
 ## Como desligar
 
 - Só na conversa atual: `/jornada-vibe-coding off`.

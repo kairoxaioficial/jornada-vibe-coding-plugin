@@ -17,28 +17,50 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 mkdir -p "$DESTINO"
-cp -R "$ORIGEM/skills/jornada-vibe-coding" "$DESTINO/"
-cp -R "$ORIGEM/skills/estruturar-projeto" "$DESTINO/"
+for skill in jornada-vibe-coding estruturar-projeto; do
+  # remove a versao antiga para nao aninhar pastas nem deixar arquivo orfao
+  rm -rf "$DESTINO/$skill"
+  cp -R "$ORIGEM/skills/$skill" "$DESTINO/$skill"
+done
 chmod +x "$DESTINO/jornada-vibe-coding/scripts/"*.sh
 echo "    Skills copiadas para $DESTINO"
 
-CTX='$HOME/.claude/skills/jornada-vibe-coding/scripts/jornada-context.sh'
-GUARD='$HOME/.claude/skills/jornada-vibe-coding/scripts/jornada-guard.sh'
+BASE='$HOME/.claude/skills/jornada-vibe-coding/scripts'
 
 [ -f "$CFG" ] || echo '{}' > "$CFG"
 BACKUP="$CFG.backup-$(date +%Y%m%d-%H%M%S)"
 cp "$CFG" "$BACKUP"
 echo "    Backup do settings.json em $BACKUP"
 
-jq --arg ctx "$CTX" --arg guard "$GUARD" '
-  .hooks //= {}
-  | .hooks.UserPromptSubmit //= []
-  | .hooks.PreToolUse //= []
-  | if ([.hooks.UserPromptSubmit[]?.hooks[]?.command] | index($ctx)) then .
-    else .hooks.UserPromptSubmit += [{hooks: [{type: "command", command: $ctx}]}] end
-  | if ([.hooks.PreToolUse[]?.hooks[]?.command] | index($guard)) then .
-    else .hooks.PreToolUse += [{matcher: "Edit|Write|MultiEdit|NotebookEdit", hooks: [{type: "command", command: $guard}]}] end
-' "$BACKUP" > "$CFG"
+# evento | matcher (vazio = sem matcher) | script
+HOOKS="
+SessionStart||$BASE/verificar-ferramentas.sh
+UserPromptSubmit||$BASE/jornada-context.sh
+PreToolUse|Edit|Write|MultiEdit|NotebookEdit|$BASE/jornada-guard.sh
+PreToolUse|Read|Grep|Glob|$BASE/jornada-p1-guard.sh
+PostToolUse|mcp__tokensave__.*|mcp__code-review-graph__.*|$BASE/jornada-p1-marca.sh
+"
+
+TMP="$BACKUP"
+while IFS= read -r linha; do
+  [ -n "$linha" ] || continue
+  evento="${linha%%|*}"
+  resto="${linha#*|}"
+  script="${resto##*|}"
+  matcher="${resto%|*}"
+  saida="$CFG.tmp.$$"
+  jq --arg ev "$evento" --arg m "$matcher" --arg c "$script" '
+    .hooks //= {}
+    | .hooks[$ev] //= []
+    | if ([.hooks[$ev][]?.hooks[]?.command] | index($c)) then .
+      else .hooks[$ev] += [ (if $m == "" then {hooks:[{type:"command",command:$c}]}
+                             else {matcher:$m, hooks:[{type:"command",command:$c}]} end) ]
+      end
+  ' "$TMP" > "$saida" && mv "$saida" "$CFG"
+  TMP="$CFG"
+done <<EOF
+$HOOKS
+EOF
 
 echo "    Hooks registrados em $CFG"
 echo

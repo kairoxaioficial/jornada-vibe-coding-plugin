@@ -4,6 +4,8 @@ Metodologia de desenvolvimento em duas fases (Análise e Codificação) empacota
 
 Ao ativar, o Claude passa a trabalhar sempre da mesma forma: primeiro entende e documenta, depois codifica em etapas, testa cada etapa, registra erros e entrega checklists em linguagem leiga.
 
+**[📖 Como a metodologia funciona — passo a passo](METODOLOGIA.md)** — o fluxo inteiro explicado em linguagem simples: cada fase, cada passo, cada documento, o que você faz e o que a IA faz.
+
 ## O que vem dentro
 
 - **Skill `jornada-vibe-coding`** — a metodologia completa, com os prompts de cada fase.
@@ -74,6 +76,8 @@ Depois reinicie o Claude Code.
 | `/jornada-vibe-coding` | Liga a metodologia para toda a sessão e todo o projeto. |
 | `/jornada-vibe-coding off` | Desliga. |
 | `/estruturar-projeto` | Cria os documentos da metodologia no projeto atual. |
+
+O passo a passo completo de cada fase está em **[METODOLOGIA.md](METODOLOGIA.md)**.
 
 Com a metodologia ligada, é só pedir o que você quer ("crie um sistema de agendamento", "adicione login") que o Claude segue o fluxo sozinho.
 
