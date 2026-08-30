@@ -42,4 +42,7 @@ jq --arg ctx "$CTX" --arg guard "$GUARD" '
 
 echo "    Hooks registrados em $CFG"
 echo
+echo "==> Agora as ferramentas obrigatorias de economia de tokens"
+bash "$ORIGEM/scripts/instalar-ferramentas.sh" || echo "    (alguma ferramenta falhou; rode depois: bash scripts/instalar-ferramentas.sh)"
+echo
 echo "==> Pronto. Feche e abra o Claude Code, depois digite: /jornada-vibe-coding"

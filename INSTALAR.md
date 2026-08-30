@@ -16,16 +16,49 @@
    ```
 
 4. Feche e abra o Claude Code de novo.
-5. Digite `/jornada-vibe-coding` para ligar a metodologia.
+5. Instale as ferramentas de economia de tokens (passo obrigatório, ver abaixo).
+6. Digite `/jornada-vibe-coding` para ligar a metodologia.
 
 ## Opção B — recebi uma pasta ou um arquivo .zip
 
 1. Descompacte o arquivo (se for `.zip`), clicando duas vezes nele.
 2. Abra o Terminal e arraste para dentro dele o arquivo `instalar.sh` que está na pasta. Aperte Enter.
 3. Feche e abra o Claude Code.
-4. Digite `/jornada-vibe-coding` para ligar a metodologia.
+4. Instale as ferramentas de economia de tokens (passo obrigatório, ver abaixo).
+5. Digite `/jornada-vibe-coding` para ligar a metodologia.
 
 A Opção B copia as skills para dentro de `~/.claude/skills/` e adiciona os dois hooks no seu `~/.claude/settings.json`. O script faz uma cópia de segurança do `settings.json` antes de mexer nele.
+
+## Passo obrigatório — as ferramentas de economia de tokens
+
+A metodologia usa sete ferramentas que fazem o Claude gastar muito menos. Sem elas ele lê arquivos inteiros e a conta fica cara.
+
+**Cinco delas se instalam pelo Terminal.** Se você instalou pela Opção A, primeiro baixe a pasta:
+
+```bash
+git clone https://github.com/kairoxaioficial/jornada-vibe-coding-plugin
+cd jornada-vibe-coding-plugin
+bash scripts/instalar-ferramentas.sh
+```
+
+Se você instalou pela Opção B, é só entrar na pasta que você descompactou e rodar a última linha.
+
+O script pergunta nada: ele instala o que falta e pula o que já existe. Para só conferir sem instalar nada:
+
+```bash
+bash scripts/instalar-ferramentas.sh --check
+```
+
+**As outras duas são plugins**, e se instalam dentro do Claude Code. Cole um comando de cada vez:
+
+```
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail
+/plugin marketplace add JuliusBrussee/caveman
+/plugin install caveman@caveman
+```
+
+Se algo falhar aqui, não tem problema: toda vez que você abrir o Claude Code, o plugin confere o que está faltando e ele mesmo se oferece para instalar antes de começar a trabalhar.
 
 ## Como saber se funcionou
 

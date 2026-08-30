@@ -32,6 +32,10 @@ ferramentas de economia de tokens. Se os documentos já existirem, NÃO sobrescr
 - Se recebeu um caminho, use-o; senão use o diretório atual.
 - Verificar se já existe `docs/` ou os arquivos da metodologia (`PRD.md`, `FSD.md`, `docs/STATUS.md`, etc.).
 
+## Passo 0 — Conferir as ferramentas obrigatórias
+
+Antes de mapear qualquer coisa, rodar `bash scripts/instalar-ferramentas.sh --check` (raiz do plugin jornada-vibe-coding). Se faltar alguma ferramenta necessária à tarefa, instalar com `bash scripts/instalar-ferramentas.sh`; `ponytail` e `caveman` são plugins e se instalam dentro do Claude Code (`/plugin marketplace add ...` + `/plugin install ...`). Referência completa: `references/ferramentas-token.md` do skill jornada-vibe-coding.
+
 ## Passo 2 — Mapear o sistema (usando os repos de tokens)
 - **tokensave (MCP):** se não houver índice, rodar `tokensave init` no projeto; depois usar `mcp__tokensave__tokensave_context`/`tokensave_entities`/`tokensave_dependencies` para mapear símbolos, entidades, rotas, estrutura.
 - **code-review-graph (MCP):** usar `build_or_update_graph_tool`, `get_architecture_overview_tool`, `list_flows_tool`, `list_communities_tool` para entender arquitetura, fluxos e módulos.
@@ -39,7 +43,7 @@ ferramentas de economia de tokens. Se os documentos já existirem, NÃO sobrescr
 - **Greenfield (sem código):** pular o scan; os documentos nascem do conceito informado ou como esqueleto.
 - **caveman:** relatório de progresso em formato comprimido.
 - **ponytail:** não criar documentos além do necessário — só os da metodologia.
-- **graphify:** opcional, quando um mapa mental do domínio ajudar.
+- **graphify:** transformar insumos longos (PDF, transcrição, documentação do cliente) em grafo consultável; se existir `graphify-out/`, consultar antes de reler arquivos.
 
 ## Passo 3 — Gerar os documentos
 Usar os templates como base. Regras:

@@ -1,4 +1,16 @@
 {
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/verificar-ferramentas.sh",
+          "timeout": 20
+        }
+      ]
+    }
+  ],
   "UserPromptSubmit": [
     {
       "hooks": [

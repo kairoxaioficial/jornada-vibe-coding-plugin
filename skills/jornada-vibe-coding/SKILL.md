@@ -26,6 +26,7 @@ Todo pedido de CRIAR, ALTERAR ou IMPLEMENTAR algo segue este fluxo.
 - `references/codificacao-etapas.md` — codificar em etapas, testes, relatar erros, segurança
 - `references/codificacao-final.md` — documentação, deploy, pedidos de alteração, rollback
 - `references/avancado-extras.md` — skills, outras stacks, erros comuns, extras IA agêntica
+- `references/ferramentas-token.md` — ferramentas obrigatórias de economia de tokens (o que são, como instalar, quando usar)
 - `references/sintese-executiva.md` — visão geral consolidada do fluxo
 **Templates de documentos:** `templates/` (PRD, DESIGN, DECISOES_TECNICAS, FSD, INSUMOS, PLANO, STATUS, ERROS, CHECKLIST, CLAUDE.md)
 **Scripts do modo sessão:** `scripts/` (`jornada-context.sh`, `jornada-guard.sh`, `jornada-session.sh`, `jornada-lib.sh`)
@@ -556,25 +557,55 @@ Se o projeto NÃO tem PRD/FSD/insumos/etc.:
 
 ## FERRAMENTAS DE ECONOMIA DE TOKENS (OBRIGATÓRIAS)
 
-Usar SEMPRE neste projeto (já ativas globalmente). **Ler o código é obrigatório antes de planejar/editar — mas SEM torrar contexto.**
+Estas sete ferramentas são **parte da metodologia**, não um extra. Usar sempre; **instalar quando faltarem**.
 
-**Ordem padrão de leitura do sistema (P1):**
-1. `mcp__tokensave__tokensave_status` → tem índice? Se não, `tokensave init` no projeto (Bash).
+| # | Ferramenta | Para que serve | Repositório |
+|---|---|---|---|
+| 1 | **tokensave** (MCP) | Grafo de código: entender o sistema sem ler arquivo inteiro | https://github.com/aovestdipaperino/tokensave |
+| 2 | **rtk** | Filtra a saída dos comandos de terminal (até 90% menos tokens) | https://github.com/rtk-ai/rtk |
+| 3 | **code-review-graph** (MCP) | Grafo estrutural: review, impacto, arquitetura | https://github.com/tirth8205/code-review-graph |
+| 4 | **graphify** | Grafo de conhecimento de qualquer insumo (código, docs, PDFs, vídeo) | https://github.com/Graphify-Labs/graphify |
+| 5 | **tokenoptim** | Compressão de prompt/contexto | https://github.com/Manas470/tokenoptim |
+| 6 | **ponytail** (plugin) | Força a solução mais simples que funciona (anti-over-engineering) | https://github.com/dietrichgebert/ponytail |
+| 7 | **caveman** (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
+
+### P0 — Verificar e instalar antes de trabalhar (obrigatório)
+
+No começo de qualquer trabalho num projeto:
+
+1. Rodar `bash scripts/instalar-ferramentas.sh --check` (na raiz deste plugin).
+2. Se faltar alguma ferramenta de linha de comando, **instalar antes de continuar**: `bash scripts/instalar-ferramentas.sh`.
+3. Se faltarem os plugins `ponytail` ou `caveman`, avisar o usuário e pedir que cole no Claude Code:
+   ```
+   /plugin marketplace add DietrichGebert/ponytail
+   /plugin install ponytail@ponytail
+   /plugin marketplace add JuliusBrussee/caveman
+   /plugin install caveman@caveman
+   ```
+4. Só depois seguir para P1.
+
+O hook `SessionStart` do plugin já reporta, a cada sessão, quais ferramentas estão presentes e quais faltam. Detalhes de uso por ferramenta: `references/ferramentas-token.md`.
+
+### Ordem padrão de leitura do sistema (P1)
+
+1. `mcp__tokensave__tokensave_status` → tem índice? Se não, `tokensave init .` no projeto (Bash).
 2. `mcp__tokensave__tokensave_context` com a descrição da tarefa (+ `keywords`) → símbolos, relações, trechos relevantes.
 3. `mcp__tokensave__tokensave_search` / `_entities` / `_files` → localizar entidades, rotas, telas.
 4. `mcp__tokensave__tokensave_callers` / `_callees` / `_impact` / `_affected` → o que a mudança quebra.
 5. `code-review-graph`: `build_or_update_graph_tool` → `get_architecture_overview_tool`, `list_flows_tool`, `list_communities_tool`, `get_impact_radius_tool`, `get_minimal_context_tool` (arquitetura, fluxos, raio de impacto).
-6. Só então `Read` **parcial** dos arquivos que sobraram (nunca dump de arquivo inteiro).
-7. Varredura ampla (muitos arquivos/pastas) → **subagente** (`Explore` / `cavecrew-investigator`), para não inchar o contexto principal.
+6. Se existir `graphify-out/` no projeto, consultar o grafo antes de reler código.
+7. Só então `Read` **parcial** dos arquivos que sobraram (nunca dump de arquivo inteiro).
+8. Varredura ampla (muitos arquivos/pastas) → **subagente** (`Explore` / `cavecrew-investigator`), para não inchar o contexto principal.
 
-**Demais ferramentas:**
-- `rtk` — saída de Bash já filtrada (hook). Nunca bypassar.
-- `caveman` — saída comprimida ao revisar/relatar.
-- `ponytail` — solução mais simples (evitar over-engineering).
-- `graphify` — transformar inputs em knowledge graph quando útil (`graphify-out/` existente → consultar antes de reler código).
-- `tokenoptim` / `headroom` — compressão de contexto/diff quando necessário.
+### Regras de uso permanentes
 
-**Proibido:** planejar, prometer ou editar código sem ter feito P1. "Não achei o arquivo" não justifica pular o mapeamento.
+- `rtk` — a saída de Bash já vem filtrada pelo hook. **Nunca** contornar com `rtk proxy` fora de depuração.
+- `ponytail` — aplicar em toda decisão de código: a solução mais simples que resolve, sem dependência desnecessária.
+- `caveman` — relatórios, reviews e respostas comprimidos; **nunca** comprimir código, caminhos, comandos, versões ou mensagens de erro.
+- `graphify` — usar para transformar insumos longos (PDF, curso, transcrição, documentação) em grafo consultável.
+- `tokenoptim` — comprimir prompts e contextos longos antes de mandar para o modelo.
+
+**Proibido:** planejar, prometer ou editar código sem ter feito P0 e P1. "Não achei o arquivo" não justifica pular o mapeamento.
 
 ---
 

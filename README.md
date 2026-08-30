@@ -9,7 +9,43 @@ Ao ativar, o Claude passa a trabalhar sempre da mesma forma: primeiro entende e 
 - **Skill `jornada-vibe-coding`** — a metodologia completa, com os prompts de cada fase.
 - **Skill `estruturar-projeto`** — cria toda a estrutura de documentos em um projeto novo ou já existente.
 - **Templates** — `PRD.md`, `DECISOES_TECNICAS.md`, `FSD.md`, `INSUMOS.md`, `DESIGN.md`, `PLANO.md`, `STATUS.md`, `ERROS.md`, `CHECKLIST.md`, `CLAUDE.md`.
-- **Hooks** — mantêm a metodologia ativa durante toda a sessão e impedem que o Claude comece a mexer no código antes de os documentos existirem.
+- **Hooks** — mantêm a metodologia ativa durante toda a sessão, impedem que o Claude comece a mexer no código antes de os documentos existirem e conferem, a cada sessão, se as ferramentas de economia de tokens estão instaladas.
+- **`scripts/instalar-ferramentas.sh`** — instala as sete ferramentas obrigatórias de economia de tokens.
+
+## Ferramentas obrigatórias de economia de tokens
+
+A metodologia **depende** destas sete ferramentas. Sem elas o agente lê arquivos inteiros, estoura o contexto no meio do projeto e a conta fica cara. Com elas, ele lê grafo em vez de código bruto.
+
+| # | Ferramenta | Para que serve | Repositório |
+|---|---|---|---|
+| 1 | tokensave (MCP) | Grafo de código: entender o sistema sem ler arquivo inteiro | https://github.com/aovestdipaperino/tokensave |
+| 2 | rtk | Filtra a saída dos comandos de terminal (até 90% menos tokens) | https://github.com/rtk-ai/rtk |
+| 3 | code-review-graph (MCP) | Grafo estrutural: review, impacto, arquitetura | https://github.com/tirth8205/code-review-graph |
+| 4 | graphify | Grafo de conhecimento de qualquer insumo (código, docs, PDF, vídeo) | https://github.com/Graphify-Labs/graphify |
+| 5 | tokenoptim | Compressão de prompt e contexto | https://github.com/Manas470/tokenoptim |
+| 6 | ponytail (plugin) | Força a solução mais simples que funciona | https://github.com/dietrichgebert/ponytail |
+| 7 | caveman (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
+
+Instalar tudo de uma vez (as cinco de linha de comando):
+
+```bash
+git clone https://github.com/kairoxaioficial/jornada-vibe-coding-plugin
+cd jornada-vibe-coding-plugin
+bash scripts/instalar-ferramentas.sh
+```
+
+Só conferir o que falta: `bash scripts/instalar-ferramentas.sh --check`
+
+As duas últimas são plugins do Claude Code. Cole dentro do Claude Code, um comando de cada vez:
+
+```
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail
+/plugin marketplace add JuliusBrussee/caveman
+/plugin install caveman@caveman
+```
+
+A cada sessão, o plugin confere o que está instalado e avisa o Claude para instalar o que faltar antes de trabalhar. As regras de uso de cada ferramenta estão em `skills/jornada-vibe-coding/references/ferramentas-token.md`.
 
 ## Instalação (recomendada)
 
@@ -36,11 +72,12 @@ Com a metodologia ligada, é só pedir o que você quer ("crie um sistema de age
 
 - Claude Code instalado.
 - `jq` disponível no terminal (os hooks usam). No macOS: `brew install jq`. No Ubuntu/Debian: `sudo apt install jq`.
+- `git`, `python3` e, de preferência, `uv` ou `pipx` — usados para instalar as ferramentas de economia de tokens.
 
 ## Observações
 
 - O arquivo de contexto do projeto é sempre `CLAUDE.md`. A metodologia nunca cria `AGENTS.md`.
-- A skill `estruturar-projeto` cita ferramentas opcionais de economia de token (tokensave, code-review-graph, rtk, caveman, ponytail, graphify). Se você não as tiver instaladas, a metodologia funciona do mesmo jeito — o Claude simplesmente lê o código do modo normal.
+- As sete ferramentas de economia de tokens são **obrigatórias**, não opcionais: o plugin confere a cada sessão e instrui o Claude a instalar o que faltar antes de trabalhar.
 - Para desinstalar: `/plugin uninstall jornada-vibe-coding@jornada`.
 
 Licença: MIT.
