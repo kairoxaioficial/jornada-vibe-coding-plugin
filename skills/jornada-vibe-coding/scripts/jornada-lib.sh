@@ -39,8 +39,24 @@ jornada_deactivate() {
   return 0
 }
 
+jornada_global_flag() { printf '%s' "$JORNADA_HOME/global-on"; }
+
+jornada_global_is_active() {
+  [ -f "$(jornada_global_flag)" ]
+}
+
+jornada_global_activate() {
+  mkdir -p "$JORNADA_HOME" 2>/dev/null
+  : > "$(jornada_global_flag)"
+}
+
+jornada_global_deactivate() {
+  rm -f "$(jornada_global_flag)"
+}
+
 jornada_is_active() {
   local session="$1" root="$2"
+  jornada_global_is_active && return 0
   [ -n "$session" ] && [ -f "$JORNADA_HOME/sessions/$session" ] && return 0
   [ -n "$root" ] && [ -f "$JORNADA_HOME/projects/$(jornada_slug "$root")" ] && return 0
   return 1

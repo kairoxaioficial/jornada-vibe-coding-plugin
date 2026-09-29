@@ -1,5 +1,5 @@
 #!/bin/bash
-# Hook PreToolUse (Read|Grep|Glob) — Jornada IA Vibe Coding.
+# Hook PreToolUse (Read|Grep|Glob|Bash) — Jornada IA Vibe Coding.
 # Enquanto a metodologia estiver ativa, obriga o P1: mapear o codigo pelo grafo
 # (tokensave / code-review-graph) ANTES de ler arquivos de codigo direto.
 # Documentos, configs e caminhos isentos passam sempre.
@@ -13,6 +13,19 @@ session="$(printf '%s' "$payload" | jq -r '.session_id // ""')"
 cwd="$(printf '%s' "$payload" | jq -r '.cwd // ""')"
 alvo="$(printf '%s' "$payload" | jq -r '.tool_input.file_path // .tool_input.path // .tool_input.pattern // ""')"
 root="$(jornada_root "${cwd:-$PWD}")"
+
+# Bash lendo codigo (cat/head/tail/sed/awk/less/grep/rg/nl) tambem conta como leitura direta.
+cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // ""')"
+if [ -n "$cmd" ]; then
+  alvo=""
+  # so a 1a linha conta (heredoc e escrita com 'cat >' nao sao leitura)
+  cmd="$(printf '%s' "$cmd" | head -1)"
+  case "$cmd" in *'cat >'*|*'cat >>'*|*'tee '*) cmd="" ;; esac
+  if printf '%s' "$cmd" | grep -qE '^[[:space:]]*(cd [^;&]+(;|&&)[[:space:]]*)?(cat|head|tail|sed|awk|less|grep|rg|nl|bat)[[:space:]]'; then
+    alvo="$(printf '%s' "$cmd" | grep -oE '[^[:space:]'"'"'"]+\.(js|mjs|cjs|ts|tsx|jsx|py|go|rs|rb|php|java|kt|swift|c|cc|cpp|h|cs|vue|svelte|dart|sql|css|scss|html)\b' | head -1)"
+    case "$alvo" in /*|"") ;; *) alvo="${cwd:-$PWD}/$alvo" ;; esac
+  fi
+fi
 
 jornada_is_active "$session" "$root" || exit 0
 jornada_p1_feito "$session" "$root" && exit 0

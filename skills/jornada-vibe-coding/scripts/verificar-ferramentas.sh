@@ -22,8 +22,8 @@ add graphify
 if tem tokenoptim || tem llm-tokenoptim; then disp="$disp tokenoptim"; else falta="$falta tokenoptim"; fi
 
 # plugins do Claude Code: procurados no disco
-for pl in ponytail caveman; do
-  if ls -d "$HOME"/.claude/plugins/*/"$pl"* >/dev/null 2>&1 || ls -d "$HOME"/.claude/skills/"$pl" >/dev/null 2>&1; then
+for pl in ponytail caveman context-mode token-optimizer claude-hud; do
+  if ls -d "$HOME"/.claude/plugins/cache/*/"$pl" >/dev/null 2>&1 || ls -d "$HOME"/.claude/skills/"$pl" >/dev/null 2>&1; then
     disp="$disp $pl"
   else
     falta="$falta $pl"
@@ -44,19 +44,27 @@ Regras obrigatorias enquanto trabalhar neste projeto:
 - Busca ampla em varios arquivos: delegar a subagente, nunca despejar arquivos inteiros no contexto principal.
 - Escrever codigo: aplicar a skill ponytail (solucao mais simples que funciona, sem over-engineering).
 - Terminal: rtk filtra a saida automaticamente; nunca contornar com 'rtk proxy'.
+- Saida grande (log, JSON, web, navegador): context-mode (ctx_execute / ctx_batch_execute) processa fora do contexto.
+- Medir: npx -y ccusage@latest daily · rtk gain · /context-mode:ctx-stats. Auditoria: skill token-optimizer.
 - Perguntas sobre a arquitetura do projeto: consultar graphify (graphify-out/) antes de ler arquivos.
 - Combinar varias ferramentas no MESMO passo (chamadas em paralelo na mesma mensagem) sempre que possivel — economiza mais que usar uma de cada vez.
 
-$regras
+$regras"
+
+# Instrucoes de instalacao so quando algo falta (economiza token em toda sessao).
+if [ -n "$falta" ]; then
+  ctx="$ctx
 
 As ferramentas de linha de comando ausentes ja estao sendo instaladas em segundo plano
 (log: ~/.claude/jornada/instalacao.log). Para forcar agora:
   bash \"$INSTALADOR\"
-Os plugins ponytail e caveman precisam ser instalados dentro do Claude Code:
-  /plugin marketplace add DietrichGebert/ponytail
-  /plugin install ponytail@ponytail
-  /plugin marketplace add JuliusBrussee/caveman
-  /plugin install caveman@caveman"
+Plugins faltando: rode o instalador acima (usa 'claude plugin install'). Ou, dentro do Claude Code:
+  /plugin marketplace add JuliusBrussee/caveman        /plugin install caveman@caveman
+  /plugin marketplace add DietrichGebert/ponytail      /plugin install ponytail@ponytail
+  /plugin marketplace add mksglu/context-mode          /plugin install context-mode@context-mode
+  /plugin marketplace add alexgreensh/token-optimizer  /plugin install token-optimizer@alexgreensh-token-optimizer
+  /plugin marketplace add jarrodwatts/claude-hud       /plugin install claude-hud@claude-hud"
+fi
 
 if command -v jq >/dev/null 2>&1; then
   jq -n --arg c "$ctx" '{hookSpecificOutput:{hookEventName:"SessionStart",additionalContext:$c}}'

@@ -49,16 +49,19 @@ O script pergunta nada: ele instala o que falta e pula o que já existe. Para s�
 bash scripts/instalar-ferramentas.sh --check
 ```
 
-**As outras duas são plugins**, e se instalam dentro do Claude Code. Cole um comando de cada vez:
+**Os plugins** (caveman, ponytail, context-mode, token-optimizer e claude-hud) o próprio script instala pelo `claude plugin install`. Se o comando `claude` não estiver no terminal, cole dentro do Claude Code, um de cada vez:
 
 ```
-/plugin marketplace add DietrichGebert/ponytail
-/plugin install ponytail@ponytail
-/plugin marketplace add JuliusBrussee/caveman
-/plugin install caveman@caveman
+/plugin marketplace add JuliusBrussee/caveman        /plugin install caveman@caveman
+/plugin marketplace add DietrichGebert/ponytail      /plugin install ponytail@ponytail
+/plugin marketplace add mksglu/context-mode          /plugin install context-mode@context-mode
+/plugin marketplace add alexgreensh/token-optimizer  /plugin install token-optimizer@alexgreensh-token-optimizer
+/plugin marketplace add jarrodwatts/claude-hud       /plugin install claude-hud@claude-hud
 ```
 
-Se algo falhar aqui, não tem problema: **o plugin baixa sozinho**. Toda vez que você abre o Claude Code, ou liga a metodologia, ele confere o que falta e instala em segundo plano (no máximo uma vez por dia). O que ele não consegue fazer sozinho são os dois plugins acima, porque só o Claude Code instala plugin.
+Para a barra de status mostrar o contexto ocupado: `/claude-hud:setup` uma vez. Para ver o gasto real: `npx -y ccusage@latest daily`.
+
+Se algo falhar aqui, não tem problema: **o plugin baixa sozinho**. Toda vez que você abre o Claude Code, ou liga a metodologia, ele confere o que falta e instala em segundo plano (no máximo uma vez por dia). Os plugins são instalados pelo `claude plugin install` quando o comando `claude` está disponível no terminal.
 
 Enquanto a metodologia estiver ligada, o Claude fica **proibido** de ler o código arquivo por arquivo antes de mapear o projeto pelo grafo — é o que faz a economia acontecer de verdade, sem depender de ele lembrar.
 

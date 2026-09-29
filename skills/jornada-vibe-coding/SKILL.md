@@ -233,6 +233,13 @@ Documentos em ordem, cada um lido/validado antes do próximo. Para cada passo, L
 **Template base:** `templates/DESIGN.md`
 **Checklist de revisão (seção 3.16):** Não genérico ("cores modernas"), contrastes OK, fontes usáveis, componentes claros, estilo combina com sistema.
 **Usar skills:** `componentes-modernos` / `design-sem-cara-de-ia` quando aplicável.
+**Skill `apple-design` — obrigatória em DOIS casos:**
+
+1. **Plataformas Apple** (iOS, iPadOS, macOS, watchOS, tvOS, visionOS, Apple Watch, Vision Pro, SwiftUI, UIKit, AppKit, Catalyst): usar a skill ANTES de escrever o `docs/DESIGN.md`. Nessas plataformas o design system não é livre: ele começa nas Human Interface Guidelines e no sistema Liquid Glass. O `docs/DESIGN.md` deve declarar quais componentes são do sistema (não redesenhar), qual é a tipografia do sistema (SF Pro / SF Compact / New York) e a escala de Dynamic Type, os SF Symbols escolhidos, o comportamento em claro/escuro, e as regras de acessibilidade (Dynamic Type, contraste, Reduce Motion, Reduce Transparency, VoiceOver, alvo mínimo de toque).
+
+2. **Qualquer projeto WEB com interface** (site, landing page, web app, painel, componente): usar a skill junto com `design-sem-cara-de-ia` e `componentes-modernos`. A `apple-design` cobre a parte que as outras não cobrem — a escada de decisão de componente (elemento HTML nativo antes de componente customizado), os padrões de experiência do usuário com as regras de quando **não** usar cada um (modal, spinner, permissão, onboarding), e a acessibilidade com os números do WCAG. O `docs/DESIGN.md` de projeto web deve declarar: quais componentes usam elemento nativo e quais são customizados (com o padrão ARIA de cada um), os estados obrigatórios de cada componente interativo, o comportamento em `prefers-color-scheme` e `prefers-reduced-motion`, os alvos de toque, e o contraste mínimo adotado.
+
+**De onde tirar os valores do `docs/DESIGN.md` web (não invente escala nova):** a skill já traz a escala tipográfica, a escala de espaçamento, os tokens de cor claro/escuro com o contraste de cada par calculado, os tokens de sombra e de movimento e o sistema de ícones prontos em `~/.claude/skills/apple-design/references/web-sistema-visual.md`. Se o projeto usa Radix, shadcn/ui, React, Next.js ou Tailwind, a conciliação está em `references/web-ponte-stack.md`. Para começar do zero com um artefato pronto, `references/web-exemplo-referencia.md` tem uma página completa e comentada.
 **Aprovação:** Usuário aprova `docs/DESIGN.md` antes de avançar.
 **Obrigatório no FSD/Codificação:** IA deve ler `docs/DESIGN.md` antes de criar/alterar qualquer tela.
 
@@ -583,6 +590,7 @@ Toda alteração de código passa por esta tabela **antes** de a tarefa ser cons
 | Autenticação, perfil, permissão, sessão | `DECISOES_TECNICAS.md` + `docs/FSD.md` |
 | Variável de ambiente, config, integração externa | `INSUMOS.md` + `DECISOES_TECNICAS.md` |
 | Cor, fonte, espaçamento, componente, padrão visual | `docs/DESIGN.md` |
+| Tela, componente ou ícone em plataforma Apple (iOS, iPadOS, macOS, watchOS, tvOS, visionOS) | `docs/DESIGN.md` + skill `apple-design` (conferir HIG antes de fechar) |
 | Etapa nova descoberta no caminho | `docs/PLANO.md` |
 | Jeito de rodar, testar ou contribuir mudou | `CLAUDE.md` |
 | Qualquer alteração de código, sempre | `docs/STATUS.md` |

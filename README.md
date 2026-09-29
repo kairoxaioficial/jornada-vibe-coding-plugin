@@ -16,7 +16,7 @@ Ao ativar, o Claude passa a trabalhar sempre da mesma forma: primeiro entende e 
 
 ## Ferramentas obrigatórias de economia de tokens
 
-A metodologia **depende** destas sete ferramentas. Sem elas o agente lê arquivos inteiros, estoura o contexto no meio do projeto e a conta fica cara. Com elas, ele lê grafo em vez de código bruto.
+A metodologia **depende** destas ferramentas. Sem elas o agente lê arquivos inteiros, estoura o contexto no meio do projeto e a conta fica cara. Com elas, ele lê grafo em vez de código bruto.
 
 | # | Ferramenta | Para que serve | Repositório |
 |---|---|---|---|
@@ -27,6 +27,10 @@ A metodologia **depende** destas sete ferramentas. Sem elas o agente lê arquivo
 | 5 | tokenoptim | Compressão de prompt e contexto | https://github.com/Manas470/tokenoptim |
 | 6 | ponytail (plugin) | Força a solução mais simples que funciona | https://github.com/dietrichgebert/ponytail |
 | 7 | caveman (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
+| 8 | context-mode (plugin) | Processa saídas grandes (log, JSON, web, navegador) fora do contexto | https://github.com/mksglu/context-mode |
+| 9 | token-optimizer (plugin) | Auditoria do que pesa em toda sessão (só auditoria; a compressão dele duplicaria o rtk) | https://github.com/alexgreensh/token-optimizer |
+| 10 | claude-hud (plugin) | Contexto ocupado na barra de status | https://github.com/jarrodwatts/claude-hud |
+| 11 | ccusage | Gasto real por dia e por sessão, sem instalar: `npx -y ccusage@latest daily` | https://github.com/ccusage/ccusage |
 
 Instalar tudo de uma vez (as cinco de linha de comando):
 
@@ -38,21 +42,26 @@ bash scripts/instalar-ferramentas.sh
 
 Só conferir o que falta: `bash scripts/instalar-ferramentas.sh --check`
 
-As duas últimas são plugins do Claude Code. Cole dentro do Claude Code, um comando de cada vez:
+O mesmo script também instala os plugins (caveman, ponytail, context-mode, token-optimizer e claude-hud) pelo `claude plugin install`. Sem o CLI do Claude Code no terminal, cole dentro do Claude Code, um de cada vez:
 
 ```
-/plugin marketplace add DietrichGebert/ponytail
-/plugin install ponytail@ponytail
-/plugin marketplace add JuliusBrussee/caveman
-/plugin install caveman@caveman
+/plugin marketplace add JuliusBrussee/caveman        /plugin install caveman@caveman
+/plugin marketplace add DietrichGebert/ponytail      /plugin install ponytail@ponytail
+/plugin marketplace add mksglu/context-mode          /plugin install context-mode@context-mode
+/plugin marketplace add alexgreensh/token-optimizer  /plugin install token-optimizer@alexgreensh-token-optimizer
+/plugin marketplace add jarrodwatts/claude-hud       /plugin install claude-hud@claude-hud
 ```
+
+Barra de status do claude-hud: `/claude-hud:setup` uma vez.
+
+Quer só a economia de tokens, sem o fluxo da metodologia? Use a skill [economia](https://github.com/kairoxaioficial/economia) (`/economia`, vale só na janela onde foi ligada).
 
 ### Uso automático, garantido por hook
 
 Não depende de o Claude "lembrar":
 
 - **Baixa sozinho.** Ao ativar a metodologia e a cada início de sessão, o plugin verifica as cinco ferramentas de linha de comando e instala em segundo plano as que faltarem (no máximo uma vez por dia). Log em `~/.claude/jornada/instalacao.log`.
-- **Obriga o uso em todo passo.** Enquanto a metodologia estiver ativa, ler código direto (`Read`, `Grep`, `Glob`) fica **bloqueado** até o mapeamento pelo grafo ser feito. A trava cai na primeira chamada de `tokensave` ou `code-review-graph` na sessão. Documentos, configs e imagens passam sempre.
+- **Obriga o uso em todo passo.** Enquanto a metodologia estiver ativa, ler código direto (`Read`, `Grep`, `Glob` ou `cat`/`sed`/`grep` no terminal) fica **bloqueado** até o mapeamento pelo grafo ser feito. A trava cai na primeira chamada de `tokensave` ou `code-review-graph` na sessão. Documentos, configs e imagens passam sempre.
 - **ponytail e caveman ficam sempre ligados.** As regras dos dois são injetadas em todo prompt pelos hooks — funcionam mesmo antes de os plugins serem instalados. O nível do caveman (`full`) é gravado automaticamente em `~/.claude/.caveman-active` se ainda não existir.
 - **Documentos nunca ficam para trás.** Toda alteração de código passa pela matriz de impacto (funcionalidade → `PRD.md`; tabela ou rota → `docs/FSD.md`; biblioteca ou banco → `DECISOES_TECNICAS.md`; variável de ambiente → `INSUMOS.md`; visual → `docs/DESIGN.md`; sempre → `docs/STATUS.md` e `docs/ERROS.md`). O hook `Stop` **não deixa a sessão encerrar** se o código mudou e o `STATUS.md` não foi atualizado.
 - **Várias ferramentas por passo, não uma.** Consultas independentes vão na mesma mensagem, em paralelo — duas consultas de grafo custam menos que ler um arquivo. A tabela de combinações por passo está em `skills/jornada-vibe-coding/SKILL.md`.
