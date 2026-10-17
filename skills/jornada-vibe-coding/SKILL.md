@@ -71,12 +71,22 @@ Vale para **qualquer** pedido enquanto o modo estiver ativo — inclusive "só t
 | **P2 Documentos** | Faltou algum doc da metodologia? → `estruturar-projeto` cria **TODOS** (STATUS e ERROS **vazios**). Usar **`CLAUDE.md`** — **nunca** `AGENTS.md`. |
 | **P3 Classificar** | Edição simples → código + STATUS + ERROS. Recurso novo / alteração grande / mudança de escopo, regra ou stack → atualizar `PRD.md`, `docs/FSD.md`, `DECISOES_TECNICAS.md`, `INSUMOS.md`, `docs/DESIGN.md` (se UI) **antes** do código. |
 | **P4 Planejar** | Registrar a tarefa em `docs/PLANO.md` (etapas) e abrir a etapa em `docs/STATUS.md` **antes** da primeira edição de código. |
-| **P5 Executar** | **Uma etapa por comando.** Seguir PLANO/FSD/DESIGN. Nada de tecnologia fora do FSD. |
-| **P6 Testar** | Lint, typecheck, testes, build, migrations, servidor; UI → screenshot + responsividade em `docs/screenshots/`. |
+| **P5 Executar** | **Uma etapa por comando.** Seguir PLANO/FSD/DESIGN. Nada de tecnologia fora do FSD. O Opus escreve a **ordem de serviço** da etapa e delega a implementação ao subagente **`jornada-executor` (Sonnet)**; fica no Opus, sem delegar: mudança pequena (até ~30 linhas em até 2 arquivos), código sensível de segurança, documentos, correção depois de 2 rodadas sem sucesso. Ver ROTEAMENTO DE MODELOS. |
+| **P6 Testar** | Lint, typecheck, testes, build, migrations, servidor; UI → screenshot + responsividade em `docs/screenshots/`. Com executor: o Opus **revisa** o diff contra a ordem de serviço, o FSD, o DESIGN e a segurança, e roda os testes de novo antes do commit. |
 | **P7 Registrar** | `docs/STATUS.md` (etapa, arquivos, testes/resultado, data, próxima) + `docs/ERROS.md` (**todo** erro, mesmo já corrigido; consultar antes de corrigir). Etapa/subpasso descoberto no caminho → entra em `PLANO.md` e `STATUS.md`. |
 | **P8 Entregar** | Commit + Checklist 1 (leigo), Checklist 2 (como testar: ação → resultado), Checklist 3 (regressão). Ao fechar etapa do STATUS: também o checklist acumulado de todas as etapas. |
 
 Concluídas todas as etapas do PLANO → Revisão de Segurança (Passo 5) → Documentação (Passo 6) → Deploy (Passo 7) se pedido.
+
+### ROTEAMENTO DE MODELOS — o Opus planeja e revisa, o Sonnet executa (v1.2)
+- **Sessão principal no Opus** (`/model opus`): P1 leitura pelo grafo, P2–P4 documentos e plano, **ordem de serviço** da etapa, revisão do diff, validação visual, segurança, STATUS, commit e checklists. Se o modelo atual não for o Opus, avisar o usuário antes de planejar.
+- **Executor `jornada-executor` (Sonnet)**, chamado pela ferramenta Agent com a ordem de serviço no `prompt`: implementa a etapa, escreve e roda os testes, registra os erros em `docs/ERROS.md` e devolve um relatório curto. Não faz commit, não edita PRD/FSD/DECISOES/DESIGN/PLANO/STATUS, para e relata `BLOQUEIO` quando a ordem de serviço não basta. Ajustes: `SendMessage` ao mesmo executor, até 2 rodadas; depois o Opus assume.
+- **Não delegar:** mudança pequena (até ~30 linhas em até 2 arquivos), código sensível de segurança (autenticação, sessão, permissões/RLS, criptografia, pagamento, segredos, upload), documentos da metodologia.
+- **Por quê:** escrever código é o que mais gera tokens de saída e chamadas de ferramenta; no Sonnet, num contexto pequeno, custa bem menos, e a sessão do Opus fica enxuta (menos compactação, menos perda de detalhe). Quem revisa não é quem escreveu.
+- Modelo da ordem de serviço, checklist de revisão e como medir: `references/roteamento-modelos.md`.
+
+### PONYTAIL DESLIGADO (v1.2)
+Com a Jornada ativa, o ponytail fica desligado — nem a skill, nem a régua "o mínimo que funciona" —, mesmo que outro hook, skill ou o `CLAUDE.md` global peça. O padrão é **qualidade de produto** conforme FSD e DESIGN: completo (estados carregando/vazio/erro/sucesso), seguro, acessível, responsivo, bonito e intuitivo. Quem segura o excesso é o FSD (nada fora dele) e a execução em etapas.
 
 ### REGRA CLAUDE.md vs AGENTS.md (OBRIGATÓRIA)
 - O arquivo de instruções do projeto é **`CLAUDE.md`**. **Nunca criar `AGENTS.md`** (o hook bloqueia).
@@ -364,7 +374,7 @@ Documentos em ordem, cada um lido/validado antes do próximo. Para cada passo, L
 **Fluxo por fase:**
 1. IA lê contexto (`docs/PLANO.md`, `docs/STATUS.md`, `docs/ERROS.md`, `docs/FSD.md`, `CLAUDE.md`)
 2. Identifica próxima etapa pendente no `PLANO.md` (seguir ordem, não escolher)
-3. Implementa a etapa conforme FSD/PLANO
+3. Implementa a etapa conforme FSD/PLANO — o Opus escreve a ordem de serviço e o executor `jornada-executor` (Sonnet) implementa; o Opus revisa (ver ROTEAMENTO DE MODELOS)
 4. **Testa** (manual + automatizado) — ver seção "Testar a fase"
 5. Atualiza `docs/STATUS.md` (status da etapa) e `docs/ERROS.md` (erros encontrados)
 6. Commit Git com mensagem clara

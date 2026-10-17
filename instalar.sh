@@ -1,6 +1,7 @@
 #!/bin/bash
 # Instalador manual da metodologia Jornada IA Vibe Coding (alternativa ao plugin).
-# Copia as skills para ~/.claude/skills e registra os dois hooks em ~/.claude/settings.json.
+# Copia as skills para ~/.claude/skills, os agentes para ~/.claude/agents e registra
+# os hooks em ~/.claude/settings.json.
 set -eu
 
 ORIGEM="$(cd "$(dirname "$0")" && pwd)"
@@ -25,6 +26,12 @@ done
 chmod +x "$DESTINO/jornada-vibe-coding/scripts/"*.sh
 echo "    Skills copiadas para $DESTINO"
 
+# subagentes (ex.: jornada-executor, que implementa as etapas no Sonnet)
+AGENTES="$HOME/.claude/agents"
+mkdir -p "$AGENTES"
+cp "$ORIGEM"/agents/*.md "$AGENTES"/
+echo "    Agentes copiados para $AGENTES"
+
 BASE='$HOME/.claude/skills/jornada-vibe-coding/scripts'
 
 [ -f "$CFG" ] || echo '{}' > "$CFG"
@@ -37,7 +44,7 @@ HOOKS="
 SessionStart||$BASE/verificar-ferramentas.sh
 UserPromptSubmit||$BASE/jornada-context.sh
 PreToolUse|Edit|Write|MultiEdit|NotebookEdit|$BASE/jornada-guard.sh
-PreToolUse|Read|Grep|Glob|$BASE/jornada-p1-guard.sh
+PreToolUse|Read|Grep|Glob|Bash|$BASE/jornada-p1-guard.sh
 PostToolUse|mcp__tokensave__.*|mcp__code-review-graph__.*|$BASE/jornada-p1-marca.sh
 PostToolUse|Edit|Write|MultiEdit|NotebookEdit|$BASE/jornada-registrar-edicao.sh
 Stop||$BASE/jornada-stop-guard.sh

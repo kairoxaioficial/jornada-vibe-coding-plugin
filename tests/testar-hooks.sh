@@ -61,6 +61,15 @@ if [ -z "$(editar "$PROJ/README.md")" ]; then ok "trava libera documento"; else 
 mkdir -p "$PROJ/docs" && touch "$PROJ/PRD.md" "$PROJ/docs/FSD.md" "$PROJ/docs/PLANO.md" "$PROJ/docs/STATUS.md" "$PROJ/docs/ERROS.md"
 if [ -z "$(editar "$PROJ/app.js")" ]; then ok "trava libera codigo com documentos"; else falha "trava libera codigo com documentos"; fi
 
+# 5. roteamento de modelos: agente executor no Sonnet e protocolo apontando para ele
+AG="$RAIZ/agents/jornada-executor.md"
+cabecalho() { awk 'NR==1 && /^---$/ {f=1; next} f && /^---$/ {exit} f' "$1" 2>/dev/null; }
+if cabecalho "$AG" | grep -q '^model: sonnet$'; then ok "agente jornada-executor com model: sonnet"; else falha "agente jornada-executor com model: sonnet"; fi
+if cabecalho "$AG" | grep -q '^name: jornada-executor$'; then ok "agente com name jornada-executor"; else falha "agente com name jornada-executor"; fi
+if contem "$saida" "jornada-executor" && contem "$saida" "ORDEM DE SERVICO"; then ok "protocolo manda delegar ao executor"; else falha "protocolo manda delegar ao executor"; fi
+if [ -f "$S/../references/roteamento-modelos.md" ] && grep -q "roteamento-modelos.md" "$S/../SKILL.md"; then ok "guia de roteamento existe e o SKILL.md aponta"; else falha "guia de roteamento existe e o SKILL.md aponta"; fi
+if grep -q 'agents/\*.md' "$RAIZ/instalar.sh"; then ok "instalar.sh copia os agentes"; else falha "instalar.sh copia os agentes"; fi
+
 echo
 echo "$total testes, $falhas falhas"
 [ "$falhas" -eq 0 ]

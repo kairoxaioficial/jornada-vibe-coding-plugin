@@ -9,7 +9,7 @@
 |---|-------|--------|------|--------|
 | 1 | Documentos do repositório | concluída | 16/10/2026 | ver git log |
 | 2 | Tirar o ponytail | concluída | 16/10/2026 | ver git log |
-| 3 | Opus planeja, Sonnet executa | pendente | — | — |
+| 3 | Opus planeja, Sonnet executa | concluída | 16/10/2026 | ver git log |
 | 4 | Menos texto repetido a cada mensagem | pendente | — | — |
 | 5 | SKILL.md mais leve | pendente | — | — |
 | 6 | Instalar, publicar e conferir | pendente | — | — |
@@ -27,6 +27,12 @@
 - Testes: `bash tests/testar-hooks.sh` → 22 testes, 0 falhas (sintaxe de todos os scripts, bloco injetado, nenhuma instrução de usar o ponytail, trava de edição).
 - Erros: ERRO-001 (corrigido).
 - Próxima etapa: 3 — Opus planeja, Sonnet executa.
+
+### Etapa 3 — Opus planeja, Sonnet executa (16/10/2026)
+- Arquivos: `agents/jornada-executor.md` (novo, `model: sonnet`), `skills/jornada-vibe-coding/references/roteamento-modelos.md` (novo: quem faz o quê, quando não delegar, modelo da ordem de serviço, revisão, medição), `SKILL.md` (P5/P6, seções "ROTEAMENTO DE MODELOS" e "PONYTAIL DESLIGADO", Passo 4), `scripts/jornada-context.sh` (P5/P6 do bloco injetado), `instalar.sh` (copia `agents/*.md` para `~/.claude/agents`; matcher da trava de leitura com `Bash`), `tests/testar-hooks.sh` (5 testes novos).
+- Testes: `bash tests/testar-hooks.sh` → 27 testes, 0 falhas.
+- Erros: ERRO-002 e ERRO-003 (corrigidos).
+- Próxima etapa: 4 — menos texto repetido a cada mensagem.
 
 ## Checklist completo — todas as etapas
 
