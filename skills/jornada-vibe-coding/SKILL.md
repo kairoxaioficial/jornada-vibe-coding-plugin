@@ -615,23 +615,20 @@ Estas sete ferramentas são **parte da metodologia**, não um extra. Usar sempre
 | 3 | **code-review-graph** (MCP) | Grafo estrutural: review, impacto, arquitetura | https://github.com/tirth8205/code-review-graph |
 | 4 | **graphify** | Grafo de conhecimento de qualquer insumo (código, docs, PDFs, vídeo) | https://github.com/Graphify-Labs/graphify |
 | 5 | **tokenoptim** | Compressão de prompt/contexto | https://github.com/Manas470/tokenoptim |
-| 6 | **ponytail** (plugin) | Força a solução mais simples que funciona (anti-over-engineering) | https://github.com/dietrichgebert/ponytail |
-| 7 | **caveman** (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
+| 6 | **caveman** (plugin) | Saída ultracomprimida sem perder substância técnica | https://github.com/JuliusBrussee/caveman |
 
 ### P0 — Instalação automática (não depende do modelo)
 
 Ao ativar a metodologia e a cada início de sessão, os hooks do plugin fazem sozinhos:
 
-1. Verificam as sete ferramentas.
+1. Verificam as seis ferramentas.
 2. **Baixam e instalam em segundo plano** as de linha de comando que faltarem (`tokensave`, `rtk`, `code-review-graph`, `graphify`, `tokenoptim`), no máximo uma vez por dia. Log: `~/.claude/jornada/instalacao.log`.
 3. Injetam no contexto quais estão disponíveis e quais faltam.
 
 O que **você** (modelo) ainda precisa fazer:
 
-- Se faltarem os plugins `ponytail` ou `caveman`, pedir ao usuário que cole no Claude Code:
+- Se faltar o plugin `caveman`, pedir ao usuário que cole no Claude Code:
   ```
-  /plugin marketplace add DietrichGebert/ponytail
-  /plugin install ponytail@ponytail
   /plugin marketplace add JuliusBrussee/caveman
   /plugin install caveman@caveman
   ```
@@ -653,7 +650,7 @@ Ou seja: em toda sessão, em todo projeto, o mapeamento por grafo vem antes da l
 | Mapear sistema existente (cold start, PRD, FSD) | `tokensave` (`_context`, `_entities`, `_files`) **+** `code-review-graph` (`get_architecture_overview_tool`, `list_flows_tool`) — em paralelo |
 | Decisões técnicas / arquitetura | `code-review-graph` (arquitetura, comunidades, hubs) **+** `tokensave` (`_dependencies`, `_imports`) |
 | Planejar etapa (PLANO/STATUS) | `tokensave` (`_impact`, `_affected`, `_callers`) **+** `code-review-graph` (`get_impact_radius_tool`, `get_affected_flows_tool`) **+** `graphify` se houver `graphify-out/` |
-| Codificar a etapa | `ponytail` (sempre) **+** `tokensave` (`_body`, `_signature`, `_str_replace`) no lugar de `Read`/`Edit` de arquivo inteiro |
+| Codificar a etapa | `tokensave` (`_body`, `_signature`, `_str_replace`) no lugar de `Read`/`Edit` de arquivo inteiro |
 | Testar / rodar comandos | `rtk` (automático) **+** `tokensave` (`_run_affected_tests`, `_test_map`) para rodar só o que importa |
 | Revisar a etapa | `code-review-graph` (`detect_changes_tool`, `get_review_context_tool`) **+** `tokensave` (`_diff_context`) |
 | Revisão de segurança | `code-review-graph` (`get_impact_radius_tool`) **+** `tokensave` (`_callers`, `_unsafe_patterns`) |
@@ -661,11 +658,9 @@ Ou seja: em toda sessão, em todo projeto, o mapeamento por grafo vem antes da l
 | Relatar / checklists / commit | `caveman` (sempre) — comprime a conversa, **nunca** o documento nem a mensagem de commit |
 | Contexto ou prompt muito longo | `tokenoptim` |
 
-### ponytail e caveman: sempre ligados
+### caveman: sempre ligado
 
-Não são opcionais nem "quando der". Os hooks do plugin injetam as duas regras em **todo prompt**, mesmo que os plugins ainda não estejam instalados — e o hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir.
-
-**ponytail** — escada obrigatória antes de escrever qualquer linha: a tarefa precisa existir? já existe no projeto? resolve com recurso nativo? com dependência já instalada? em uma linha? só então o mínimo que funciona. Nunca cortar validação, tratamento de erro, segurança ou acessibilidade.
+Não são opcionais nem "quando der". Os hooks do plugin injetam a regra em **todo prompt**, mesmo que o plugin ainda não esteja instalado — e o hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir.
 
 **caveman** — resposta comprimida: sem preâmbulo, sem resumo final, sem narrar tool call. **Nunca** comprimir código, comandos, caminhos, erros, números, versões e avisos de segurança. **Nunca** comprimir o que fica gravado: PRD, FSD, STATUS, ERROS, PLANO, checklists em linguagem leiga e mensagens de commit saem em português normal, por extenso.
 
@@ -683,7 +678,6 @@ Não são opcionais nem "quando der". Os hooks do plugin injetam as duas regras 
 ### Regras de uso permanentes
 
 - `rtk` — a saída de Bash já vem filtrada pelo hook. **Nunca** contornar com `rtk proxy` fora de depuração.
-- `ponytail` — aplicar em toda decisão de código: a solução mais simples que resolve, sem dependência desnecessária.
 - `caveman` — relatórios, reviews e respostas comprimidos; **nunca** comprimir código, caminhos, comandos, versões ou mensagens de erro.
 - `graphify` — usar para transformar insumos longos (PDF, curso, transcrição, documentação) em grafo consultável.
 - `tokenoptim` — comprimir prompts e contextos longos antes de mandar para o modelo.

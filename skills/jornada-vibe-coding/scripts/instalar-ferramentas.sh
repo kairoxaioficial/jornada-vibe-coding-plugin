@@ -34,7 +34,7 @@ instalar_py() { # $1 = pacote pip
 }
 
 # ---------------------------------------------------------------- 1. tokensave
-titulo "1/10 tokensave — grafo de codigo (MCP)  https://github.com/aovestdipaperino/tokensave"
+titulo "1/9 tokensave — grafo de codigo (MCP)  https://github.com/aovestdipaperino/tokensave"
 if tem tokensave; then registrar_ok tokensave; else
   if [ "$MODO" = "--check" ]; then registrar_falta tokensave; else
     if tem brew; then brew install aovestdipaperino/tap/tokensave
@@ -45,7 +45,7 @@ fi
 tem tokensave && [ "$MODO" != "--check" ] && tokensave install --agent claude || true
 
 # ---------------------------------------------------------------- 2. rtk
-titulo "2/10 rtk — filtro de saida do terminal  https://github.com/rtk-ai/rtk"
+titulo "2/9 rtk — filtro de saida do terminal  https://github.com/rtk-ai/rtk"
 if tem rtk; then registrar_ok rtk; else
   if [ "$MODO" = "--check" ]; then registrar_falta rtk; else
     if tem brew; then brew install rtk
@@ -55,21 +55,21 @@ fi
 tem rtk && [ "$MODO" != "--check" ] && rtk init -g || true
 
 # ---------------------------------------------------------------- 3. code-review-graph
-titulo "3/10 code-review-graph — grafo estrutural para review (MCP)  https://github.com/tirth8205/code-review-graph"
+titulo "3/9 code-review-graph — grafo estrutural para review (MCP)  https://github.com/tirth8205/code-review-graph"
 if tem code-review-graph; then registrar_ok code-review-graph; else
   if [ "$MODO" = "--check" ]; then registrar_falta code-review-graph; else instalar_py code-review-graph; fi
 fi
 tem code-review-graph && [ "$MODO" != "--check" ] && code-review-graph install --platform claude-code || true
 
 # ---------------------------------------------------------------- 4. graphify
-titulo "4/10 graphify — grafo de conhecimento  https://github.com/Graphify-Labs/graphify"
+titulo "4/9 graphify — grafo de conhecimento  https://github.com/Graphify-Labs/graphify"
 if tem graphify; then registrar_ok graphify; else
   if [ "$MODO" = "--check" ]; then registrar_falta graphify; else instalar_py graphifyy; fi
 fi
 tem graphify && [ "$MODO" != "--check" ] && graphify install || true
 
 # ---------------------------------------------------------------- 5. tokenoptim
-titulo "5/10 tokenoptim — compressao de prompt  https://github.com/Manas470/tokenoptim"
+titulo "5/9 tokenoptim — compressao de prompt  https://github.com/Manas470/tokenoptim"
 if tem tokenoptim || tem llm-tokenoptim; then registrar_ok "$(tem tokenoptim && echo tokenoptim || echo llm-tokenoptim)"; else
   if [ "$MODO" = "--check" ]; then registrar_falta tokenoptim; else instalar_py llm-tokenoptim; fi
 fi
@@ -84,15 +84,13 @@ instalar_plugin() { # $1 = repo do marketplace  $2 = plugin@marketplace  $3 = no
   claude plugin marketplace add "$1" >/dev/null 2>&1
   if claude plugin install "$2" >/dev/null 2>&1; then aviso "instalado: $2"; OK="$OK $3"; else registrar_falta "$3"; aviso "falhou: claude plugin install $2"; fi
 }
-titulo "6/10 caveman — resposta comprimida  https://github.com/JuliusBrussee/caveman"
+titulo "6/9 caveman — resposta comprimida  https://github.com/JuliusBrussee/caveman"
 instalar_plugin JuliusBrussee/caveman caveman@caveman caveman
-titulo "7/10 ponytail — solucao mais simples que funciona  https://github.com/DietrichGebert/ponytail"
-instalar_plugin DietrichGebert/ponytail ponytail@ponytail ponytail
-titulo "8/10 context-mode — saidas grandes fora do contexto  https://github.com/mksglu/context-mode"
+titulo "7/9 context-mode — saidas grandes fora do contexto  https://github.com/mksglu/context-mode"
 instalar_plugin mksglu/context-mode context-mode@context-mode context-mode
-titulo "9/10 token-optimizer — auditoria de desperdicio  https://github.com/alexgreensh/token-optimizer"
+titulo "8/9 token-optimizer — auditoria de desperdicio  https://github.com/alexgreensh/token-optimizer"
 instalar_plugin alexgreensh/token-optimizer token-optimizer@alexgreensh-token-optimizer token-optimizer
-titulo "10/10 claude-hud — contexto ocupado na barra de status  https://github.com/jarrodwatts/claude-hud"
+titulo "9/9 claude-hud — contexto ocupado na barra de status  https://github.com/jarrodwatts/claude-hud"
 instalar_plugin jarrodwatts/claude-hud claude-hud@claude-hud claude-hud
 aviso "barra de status: rode /claude-hud:setup uma vez dentro do Claude Code."
 aviso "medicao de gasto (sem instalar nada): npx -y ccusage@latest daily"

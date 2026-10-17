@@ -31,7 +31,7 @@ A Opção B copia as skills para dentro de `~/.claude/skills/` e adiciona os doi
 
 ## Passo obrigatório — as ferramentas de economia de tokens
 
-A metodologia usa sete ferramentas que fazem o Claude gastar muito menos. Sem elas ele lê arquivos inteiros e a conta fica cara.
+A metodologia usa nove ferramentas que fazem o Claude gastar muito menos. Sem elas ele lê arquivos inteiros e a conta fica cara.
 
 **Cinco delas se instalam pelo Terminal.** Se você instalou pela Opção A, primeiro baixe a pasta:
 
@@ -49,11 +49,10 @@ O script pergunta nada: ele instala o que falta e pula o que já existe. Para s�
 bash scripts/instalar-ferramentas.sh --check
 ```
 
-**Os plugins** (caveman, ponytail, context-mode, token-optimizer e claude-hud) o próprio script instala pelo `claude plugin install`. Se o comando `claude` não estiver no terminal, cole dentro do Claude Code, um de cada vez:
+**Os plugins** (caveman, context-mode, token-optimizer e claude-hud) o próprio script instala pelo `claude plugin install`. Se o comando `claude` não estiver no terminal, cole dentro do Claude Code, um de cada vez:
 
 ```
 /plugin marketplace add JuliusBrussee/caveman        /plugin install caveman@caveman
-/plugin marketplace add DietrichGebert/ponytail      /plugin install ponytail@ponytail
 /plugin marketplace add mksglu/context-mode          /plugin install context-mode@context-mode
 /plugin marketplace add alexgreensh/token-optimizer  /plugin install token-optimizer@alexgreensh-token-optimizer
 /plugin marketplace add jarrodwatts/claude-hud       /plugin install claude-hud@claude-hud
@@ -65,7 +64,7 @@ Se algo falhar aqui, não tem problema: **o plugin baixa sozinho**. Toda vez que
 
 Enquanto a metodologia estiver ligada, o Claude fica **proibido** de ler o código arquivo por arquivo antes de mapear o projeto pelo grafo — é o que faz a economia acontecer de verdade, sem depender de ele lembrar.
 
-Duas dessas ferramentas ficam **sempre ligadas**, em toda resposta: o *ponytail* (obriga a solução mais simples que funciona) e o *caveman* (deixa as respostas curtas e diretas). Os documentos da metodologia, os checklists e as mensagens de commit continuam escritos em português normal, por extenso — só a conversa fica mais enxuta.
+O *caveman* fica **sempre ligado**, em toda resposta: deixa as respostas curtas e diretas. Os documentos da metodologia, os checklists e as mensagens de commit continuam escritos em português normal, por extenso — só a conversa fica mais enxuta. O *ponytail* não faz mais parte da metodologia (versão 1.2.0) e fica desligado enquanto ela estiver ativa.
 
 ## Como saber se funcionou
 

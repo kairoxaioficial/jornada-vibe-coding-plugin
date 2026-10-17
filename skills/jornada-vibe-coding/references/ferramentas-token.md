@@ -109,23 +109,7 @@ Usar: `llm-tokenoptim compress` para encolher prompts e contextos longos antes d
 
 ---
 
-## 6. ponytail — a solução mais simples que funciona (plugin)
-
-Repositório: https://github.com/dietrichgebert/ponytail
-
-Instalar (dentro do Claude Code, um comando de cada vez):
-```
-/plugin marketplace add DietrichGebert/ponytail
-/plugin install ponytail@ponytail
-```
-
-Obriga a escada: a tarefa precisa existir? Dá para resolver com o que já está instalado? Dá em uma linha? Só então escreva o mínimo que funciona. Nunca corta validação, tratamento de erro, segurança ou acessibilidade.
-
-Regra: aplicar em toda decisão de código da fase de Codificação.
-
----
-
-## 7. caveman — saída ultracomprimida (plugin)
+## 6. caveman — saída ultracomprimida (plugin)
 
 Repositório: https://github.com/JuliusBrussee/caveman
 
@@ -141,7 +125,7 @@ Regra: comprime a conversa, **nunca** o conteúdo técnico. Código, caminhos de
 
 ---
 
-## 8. context-mode — saídas grandes fora do contexto (plugin)
+## 7. context-mode — saídas grandes fora do contexto (plugin)
 
 Repositório: https://github.com/mksglu/context-mode
 
@@ -152,7 +136,7 @@ Repositório: https://github.com/mksglu/context-mode
 
 Servidor MCP com sandbox. Quando a tarefa é **processar** uma saída grande (contar, filtrar, resumir log, JSON, página web, snapshot do navegador, dezenas de arquivos), usar `ctx_execute`, `ctx_batch_execute` ou `ctx_execute_file`: o script roda fora e só o resultado entra no contexto. Para documentação e páginas web, `ctx_fetch_and_index` + `ctx_search`. Para **editar** um arquivo, continuar com `Read` normal (o `Edit` precisa do texto exato). Não força estilo de resposta, então não conflita com o caveman. Diagnóstico: `/context-mode:ctx-doctor`; economia medida: `/context-mode:ctx-stats`.
 
-## 9. token-optimizer — auditoria de desperdício (plugin)
+## 8. token-optimizer — auditoria de desperdício (plugin)
 
 Repositório: https://github.com/alexgreensh/token-optimizer
 
@@ -163,7 +147,7 @@ Repositório: https://github.com/alexgreensh/token-optimizer
 
 Usado **só para auditar**: skill `token-optimizer` mostra quanto cada skill, plugin, memória e configuração custa em toda sessão. A compressão automática dele fica desligada (não rodar o `/token-optimizer` de configuração): a compressão de terminal duplicaria o rtk e o "mapa de estrutura" no lugar do arquivo pode esconder código.
 
-## 10. claude-hud — contexto ocupado na barra de status (plugin)
+## 9. claude-hud — contexto ocupado na barra de status (plugin)
 
 Repositório: https://github.com/jarrodwatts/claude-hud
 
@@ -175,7 +159,7 @@ Repositório: https://github.com/jarrodwatts/claude-hud
 
 Mostra na barra de status o modelo, o projeto e quanto do contexto já foi usado. Não gasta token.
 
-## 11. ccusage — gasto real (sem instalar)
+## 10. ccusage — gasto real (sem instalar)
 
 Repositório: https://github.com/ccusage/ccusage
 
@@ -198,9 +182,9 @@ Lê os registros locais do Claude Code e mostra tokens e custo. Serve para prova
 
 Cada skill e plugin instalado custa token em **toda** mensagem (nome e descrição entram na lista). Conferir com `claude plugin details <plugin>` (linha "Always-on"). Plugin grande que não é usado deve ficar desligado (`claude plugin disable <plugin>`).
 
-## ponytail e caveman ficam sempre ligados
+## caveman fica sempre ligado
 
-Os hooks do plugin injetam as regras dos dois em todo prompt, mesmo antes de os plugins estarem instalados, e gravam `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir. Instalar os plugins melhora (eles trazem as sub-skills), mas não é o que garante a ativação.
+Os hooks do plugin injetam a regra dele em todo prompt, mesmo antes de o plugin estar instalado, e gravam `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir. Instalar o plugin melhora (ele traz as sub-skills), mas não é o que garante a ativação.
 
 ## Combine ferramentas no mesmo passo
 
@@ -212,5 +196,4 @@ Não use uma ferramenta por vez. Chamadas independentes vão juntas, na mesma me
 2. `tokensave_context` — entender o que já existe.
 3. `code-review-graph` — arquitetura e impacto da mudança.
 4. `Read` parcial só do que sobrou.
-5. Escrever código sob a régua do `ponytail`.
-6. Relatar de forma comprimida (`caveman`), com os checklists da metodologia em linguagem leiga.
+5. Relatar de forma comprimida (`caveman`), com os checklists da metodologia em linguagem leiga.

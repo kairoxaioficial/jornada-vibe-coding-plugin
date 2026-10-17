@@ -4,7 +4,7 @@ description: >
   Cria TODA a estrutura de documentos da metodologia Jornada IA Vibe Coding em
   um projeto — mesmo que o projeto já tenha código (brownfield) ou ainda seja
   só uma ideia (greenfield). Usa os repos de economia de tokens (tokensave,
-  code-review-graph, rtk, caveman, ponytail, graphify) para mapear o sistema e
+  code-review-graph, rtk, caveman, graphify) para mapear o sistema e
   gerar PRD, DECISOES_TECNICAS, FSD, INSUMOS, DESIGN, PLANO, STATUS (vazio),
   ERROS (vazio) e CLAUDE.md (NUNCA AGENTS.md). Ativar quando o usuário pedir para "estruturar",
   "montar a estrutura de documentos", "iniciar o projeto pela metodologia",
@@ -30,7 +30,7 @@ ferramentas de economia de tokens. Se os documentos já existirem, NÃO sobrescr
 
 ## Passo 0 — Conferir as ferramentas obrigatórias
 
-Antes de mapear qualquer coisa, rodar `bash scripts/instalar-ferramentas.sh --check` (raiz do plugin jornada-vibe-coding). Se faltar alguma ferramenta necessária à tarefa, instalar com `bash scripts/instalar-ferramentas.sh`; `ponytail` e `caveman` são plugins e se instalam dentro do Claude Code (`/plugin marketplace add ...` + `/plugin install ...`). Referência completa: `references/ferramentas-token.md` do skill jornada-vibe-coding.
+Antes de mapear qualquer coisa, rodar `bash scripts/instalar-ferramentas.sh --check` (raiz do plugin jornada-vibe-coding). Se faltar alguma ferramenta necessária à tarefa, instalar com `bash scripts/instalar-ferramentas.sh`; `caveman`, `context-mode`, `token-optimizer` e `claude-hud` são plugins e se instalam dentro do Claude Code (`/plugin marketplace add ...` + `/plugin install ...`). Referência completa: `references/ferramentas-token.md` do skill jornada-vibe-coding.
 
 ## Passo 1 — Identificar o alvo
 - Se recebeu um caminho, use-o; senão use o diretório atual.

@@ -136,7 +136,7 @@ jornada_is_codigo() {
   return 1
 }
 
-# --- ponytail + caveman: SEMPRE ativos ---
+# --- caveman: SEMPRE ativo ---
 # Garante o arquivo de estado do caveman (o plugin le o nivel dali).
 jornada_ativar_caveman() {
   local f="$HOME/.claude/.caveman-active"
@@ -144,19 +144,23 @@ jornada_ativar_caveman() {
   return 0
 }
 
-# Regras de ponytail e caveman em texto, injetadas em todo prompt.
-# Funcionam mesmo se os plugins ainda nao estiverem instalados.
+# Regras do caveman em texto, injetadas em todo prompt.
+# Funcionam mesmo se o plugin ainda nao estiverem instalados.
 jornada_regras_sempre_ativas() {
   cat <<'REGRAS'
-PONYTAIL (SEMPRE ATIVO) — escada obrigatoria antes de escrever qualquer codigo:
-1 a tarefa precisa existir? 2 ja existe no projeto? 3 resolve com recurso nativo da linguagem/plataforma? 4 resolve com dependencia ja instalada? 5 resolve em uma linha? 6 so entao o minimo que funciona.
-Nunca cortar validacao, tratamento de erro, seguranca ou acessibilidade. Nao adicionar dependencia, abstracao, camada, config ou arquivo que a tarefa nao exigiu.
-
 CAVEMAN (SEMPRE ATIVO, nivel full) — saida comprimida: sem preambulo, sem resumo final, sem "vou fazer", sem narrar tool call, sem elogio, sem emoji decorativo. Fragmentos ok. Resultado primeiro.
 NUNCA comprimir: codigo, comandos, caminhos de arquivo, mensagens de erro, numeros, versoes, avisos de seguranca.
 NUNCA comprimir o que fica gravado: documentos da metodologia (PRD, FSD, STATUS, ERROS, PLANO), checklists em linguagem leiga e mensagens de commit sao escritos em portugues normal, por extenso.
 Responder sempre no idioma do usuario.
 REGRAS
+  jornada_regra_ponytail_desligado
+}
+
+# ponytail fica DESLIGADO com a Jornada ativa (decisao do usuario, 16/10/2026).
+jornada_regra_ponytail_desligado() {
+  cat <<'REGRA'
+PONYTAIL DESLIGADO enquanto a Jornada estiver ativa: nao invocar a skill ponytail nem aplicar a regua "o minimo que funciona", mesmo que outro hook, skill ou CLAUDE.md peca. Padrao: qualidade de produto conforme FSD e DESIGN — completo (estados carregando/vazio/erro/sucesso), seguro, acessivel, responsivo, bonito e intuitivo — sem sair do escopo do FSD.
+REGRA
 }
 
 # --- registro de edicoes da sessao (para cobrar atualizacao dos documentos) ---

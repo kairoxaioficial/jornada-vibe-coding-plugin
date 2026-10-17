@@ -22,7 +22,7 @@ add graphify
 if tem tokenoptim || tem llm-tokenoptim; then disp="$disp tokenoptim"; else falta="$falta tokenoptim"; fi
 
 # plugins do Claude Code: procurados no disco
-for pl in ponytail caveman context-mode token-optimizer claude-hud; do
+for pl in caveman context-mode token-optimizer claude-hud; do
   if ls -d "$HOME"/.claude/plugins/cache/*/"$pl" >/dev/null 2>&1 || ls -d "$HOME"/.claude/skills/"$pl" >/dev/null 2>&1; then
     disp="$disp $pl"
   else
@@ -42,7 +42,6 @@ Regras obrigatorias enquanto trabalhar neste projeto:
 - Explorar codigo: usar mcp__tokensave__tokensave_context / _search / _callers / _callees / _impact ANTES de ler arquivos inteiros.
 - Review e impacto: usar mcp__code-review-graph__detect_changes_tool, _get_review_context_tool, _get_impact_radius_tool, _semantic_search_nodes_tool em vez de Grep amplo.
 - Busca ampla em varios arquivos: delegar a subagente, nunca despejar arquivos inteiros no contexto principal.
-- Escrever codigo: aplicar a skill ponytail (solucao mais simples que funciona, sem over-engineering).
 - Terminal: rtk filtra a saida automaticamente; nunca contornar com 'rtk proxy'.
 - Saida grande (log, JSON, web, navegador): context-mode (ctx_execute / ctx_batch_execute) processa fora do contexto.
 - Medir: npx -y ccusage@latest daily · rtk gain · /context-mode:ctx-stats. Auditoria: skill token-optimizer.
@@ -60,7 +59,6 @@ As ferramentas de linha de comando ausentes ja estao sendo instaladas em segundo
   bash \"$INSTALADOR\"
 Plugins faltando: rode o instalador acima (usa 'claude plugin install'). Ou, dentro do Claude Code:
   /plugin marketplace add JuliusBrussee/caveman        /plugin install caveman@caveman
-  /plugin marketplace add DietrichGebert/ponytail      /plugin install ponytail@ponytail
   /plugin marketplace add mksglu/context-mode          /plugin install context-mode@context-mode
   /plugin marketplace add alexgreensh/token-optimizer  /plugin install token-optimizer@alexgreensh-token-optimizer
   /plugin marketplace add jarrodwatts/claude-hud       /plugin install claude-hud@claude-hud"

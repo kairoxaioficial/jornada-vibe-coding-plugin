@@ -193,7 +193,8 @@ Isto não depende de a IA lembrar das regras. São hooks que rodam por fora e po
 | **`AGENTS.md`** | Bloqueado sempre. O padrão é `CLAUDE.md`. |
 | **Leitura cara** | Bloqueia `Read`, `Grep` e `Glob` em arquivos de código enquanto o mapeamento por grafo não for feito na sessão. Cai na primeira consulta ao `tokensave` ou ao `code-review-graph`. |
 | **Ferramentas ausentes** | Instala em segundo plano o que faltar, no máximo uma vez por dia. |
-| **ponytail e caveman** | Regras reinjetadas em toda mensagem: solução mais simples que funciona, resposta sem enrolação. |
+| **caveman** | Resposta sem enrolação em toda mensagem; documentos, checklists e commits continuam por extenso. |
+| **ponytail desligado** | Com a metodologia ativa, o ponytail não é usado, mesmo que outra regra peça: o padrão é qualidade de produto dentro do escopo do FSD. |
 | **Documento desatualizado** | Bloqueia encerrar a sessão se o código mudou e o `docs/STATUS.md` não foi atualizado; devolve a matriz de impacto com os demais documentos a revisar. |
 
 **Limite honesto:** as travas cobrem as ferramentas de edição e leitura. Quem escrever código por comando de terminal (`cat > arquivo`, `sed -i`, geradores) passa por fora. Isso é violação da metodologia, não brecha para usar.
@@ -240,7 +241,7 @@ Duas coisas valem ao mesmo tempo aqui, e não se contradizem: **cobrir 100% do p
 
 ## Economia de tokens em cada passo
 
-Sete ferramentas obrigatórias, instaladas sozinhas. Não é uma por passo — quantas couberem, chamadas em paralelo:
+Nove ferramentas obrigatórias, instaladas sozinhas. Não é uma por passo — quantas couberem, chamadas em paralelo:
 
 | Passo | Ferramentas |
 |---|---|
@@ -248,7 +249,7 @@ Sete ferramentas obrigatórias, instaladas sozinhas. Não é uma por passo — q
 | Mapear o sistema | `tokensave` + `code-review-graph`, juntos |
 | Arquitetura e decisões | `code-review-graph` + `tokensave` |
 | Planejar a etapa / medir impacto | `tokensave` (impacto, quem chama) + `code-review-graph` (raio de impacto) |
-| Escrever o código | `ponytail` sempre + `tokensave` no lugar de abrir arquivos |
+| Escrever o código | executor Sonnet (`jornada-executor`) + `tokensave` no lugar de abrir arquivos |
 | Rodar comandos e testes | `rtk` (automático) + `tokensave` (rodar só os testes afetados) |
 | Revisar a etapa | `code-review-graph` (o que mudou, contexto do review) |
 | Falar com você | `caveman` — comprime a conversa, **nunca** o documento, o checklist nem a mensagem de commit |

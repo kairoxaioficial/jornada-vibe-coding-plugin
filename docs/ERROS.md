@@ -18,6 +18,16 @@
 
 | # | ID | Data | Etapa | Título | Status |
 |---|----|------|-------|--------|--------|
+| 1 | ERRO-001 | 16/10/2026 | 2 | Teste "sem ponytail" acusou o nome da função da regra | corrigido |
+
+### ERRO-001: teste "sem ponytail" acusou o nome da função da regra
+- **Data:** 16/10/2026
+- **Etapa:** 2 — Tirar o ponytail
+- **Erro exato:** `FALHA skills e scripts sem ponytail: .../jornada-lib.sh:156:  jornada_regra_ponytail`
+- **Causa:** o teste aceita a palavra "ponytail" só em linha que também diga "desligado"; a função se chamava `jornada_regra_ponytail`.
+- **Correção:** função renomeada para `jornada_regra_ponytail_desligado`.
+- **Como evitar:** qualquer menção ao ponytail em skills e scripts deve deixar claro que ele está desligado.
+- **Status:** corrigido
 
 ## Erros conhecidos — padrões para evitar
 
