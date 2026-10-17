@@ -159,6 +159,7 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - (v1.2.1) O executor roda em `high` por padrão; a ordem de serviço declara quando a etapa vai em `xhigh`.
 - (v1.2.1) Nenhum workflow com vários agentes é aberto sem o ok do usuário, salvo quando ele mesmo pediu no comando.
 - (v1.2.1) Toda ordem de serviço traz os ângulos considerados, e todo teste novo foi visto reprovando sem a mudança.
+- (v1.2.1) Notificações de tarefas em segundo plano e caminhos de arquivo não ligam nem desligam a metodologia; só o texto do usuário.
 
 ## 11. Dúvidas ou decisões pendentes
 

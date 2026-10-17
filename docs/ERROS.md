@@ -22,6 +22,26 @@
 | 2 | ERRO-002 | 16/10/2026 | 3 | `instalar.sh` registrava a trava de leitura sem o `Bash` | corrigido |
 | 3 | ERRO-003 | 16/10/2026 | 3 | Teste "sem ponytail" acusou a nova seção do SKILL.md | corrigido |
 | 4 | ERRO-004 | 16/10/2026 | 6 | Comando `timeout` não existe no macOS (teste real do executor) | corrigido |
+| 5 | ERRO-005 | 17/10/2026 | 9 | Detector de esforço levava 3,5 s num histórico de 20 MB | corrigido |
+| 6 | ERRO-006 | 17/10/2026 | 9 | Notificação de tarefa com caminho "jornada-vibe-coding" ligou a Jornada | corrigido |
+
+### ERRO-006: notificação de tarefa ligou a Jornada (caminho com jornada-vibe-coding)
+- **Data:** 17/10/2026
+- **Etapa:** 9 (achado na revisão do Opus)
+- **Erro exato:** quando chegou a notificação do executor, cujo texto citava `skills/jornada-vibe-coding/scripts/...`, o hook respondeu `[jornada-vibe-coding] MODO METODOLOGIA ATIVADO (sessao + projeto /Users/adriel/jornada-vibe-coding-plugin).`
+- **Causa:** o `jornada-context.sh` procurava `/jornada-vibe-coding` em qualquer lugar do texto, e as notificações de tarefas em segundo plano também passam pelo UserPromptSubmit. Pelo mesmo caminho, um relatório de agente que citasse `/jornada-vibe-coding off` desligaria as travas da sessão.
+- **Correção:** notificação (`<task-notification>`) não liga nem desliga; caminhos de arquivo com `jornada-vibe-coding` são retirados do texto antes da comparação; 4 testes novos (os 3 primeiros reprovam sem a correção).
+- **Como evitar:** ligar e desligar só por texto do usuário; nunca casar o nome da skill dentro de caminhos.
+- **Status:** corrigido
+
+### ERRO-005: detector de esforço lento em histórico grande (grep depois de pipe no macOS)
+- **Data:** 17/10/2026
+- **Etapa:** 9
+- **Erro exato:** `FALHA esforco: transcript de 20 MB em 3518 ms` (limite do teste: 1000 ms)
+- **Causa:** a primeira versão fazia `tail -c +N arquivo | grep -a -F ...`; o grep do macOS lê muito mais devagar de pipe (1,2 s em 20 MB) do que de arquivo redirecionado (0,06 s).
+- **Correção:** `grep -a -b -F '<local-command-stdout>' < arquivo` (o `-b` dá o byte inicial de cada linha) e um `awk` filtra as linhas a partir do ponto gravado; a busca do modelo usa só os últimos 2 MB. Medido: 168 a 206 ms em 20 MB.
+- **Como evitar:** em arquivo grande, ler direto com `< arquivo`, não por pipe; medir com histórico sintético de 20 MB.
+- **Status:** corrigido
 
 ### ERRO-004: comando `timeout` não existe no macOS
 - **Data:** 16/10/2026

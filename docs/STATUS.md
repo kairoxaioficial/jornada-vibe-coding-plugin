@@ -16,8 +16,8 @@
 | 6 | Instalar, publicar e conferir | concluída | 16/10/2026 | ver git log |
 | 7 | Documentos da 1.2.1 | concluída | 17/10/2026 | ver git log |
 | 8 | Regras novas da metodologia | concluída | 17/10/2026 | ver git log |
-| 9 | Aviso de esforço no hook | em andamento | 17/10/2026 | — |
-| 10 | Instalar, publicar e conferir (1.2.1) | pendente | — | — |
+| 9 | Aviso de esforço no hook | concluída | 17/10/2026 | ver git log |
+| 10 | Instalar, publicar e conferir (1.2.1) | em andamento | 17/10/2026 | — |
 
 ## Detalhamento das etapas
 
@@ -73,6 +73,13 @@
 - Testes: `bash tests/testar-hooks.sh` → 43 testes, 0 falhas. SKILL.md com 47.617 bytes (limite do teste: 50 KB).
 - Erros: nenhum.
 - Próxima etapa: 9 — aviso de esforço no hook.
+
+### Etapa 9 — Aviso de esforço no hook (17/10/2026)
+- Quem fez: o executor Sonnet (`jornada-executor`, esforço `high`) implementou a partir da ordem de serviço; o Opus revisou o diff, rodou os testes de novo e corrigiu um defeito antigo achado na revisão (ERRO-006).
+- Arquivos: `scripts/jornada-lib.sh` (`jornada_esforco_marca`, `jornada_esforco_inicio`, `jornada_esforco`), `scripts/jornada-context.sh` (lê `transcript_path`; linha de esforço nos dois blocos; P4, P5 e P6 com as regras da 1.2.1; linha "ESFORCO E ULTRACODE"; ligar e desligar só por texto do usuário), `scripts/verificar-ferramentas.sh` (ponto de partida do detector no início e na retomada do processo), `tests/testar-hooks.sh` (18 testes novos), `docs/ERROS.md` (ERRO-005 e ERRO-006), `docs/FSD.md` (seção 9a com a implementação, testes 12, segurança), `DECISOES_TECNICAS.md` (decisão 16), `PRD.md` (critério de aceitação).
+- Testes: `bash tests/testar-hooks.sh` → 61 testes, 0 falhas. Bloco curto com 988 bytes. Detector em histórico sintético de 20 MB: cerca de 200 ms. Nos históricos reais desta máquina (7 e 9 MB), a linha saiu `Esforco da sessao: max (/effort) | Ultracode: ligado`, que é o estado real das duas sessões. Conferência dos testes novos sem a mudança: o executor desfez cada trecho e viu reprovar; o Opus desfez a correção do ERRO-006 e viu os 3 testes dela reprovarem, depois restaurou.
+- Erros: ERRO-005 (detector lento por pipe no macOS) e ERRO-006 (notificação de tarefa ligava a Jornada), corrigidos.
+- Próxima etapa: 10 — instalar, publicar e conferir.
 
 ### Revisão de segurança dos scripts (Passo 5) — 16/10/2026
 - Texto do prompt só é comparado em `case`, nunca executado nem interpolado em comando.

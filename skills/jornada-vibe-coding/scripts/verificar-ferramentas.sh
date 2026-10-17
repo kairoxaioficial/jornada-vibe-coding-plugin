@@ -18,13 +18,17 @@ LIB="$AQUI/jornada-lib.sh"
 jornada_garantir_ferramentas 2>/dev/null || true
 jornada_ativar_caveman 2>/dev/null || true
 
-session=""; cwd=""
+session=""; cwd=""; source=""; transcript=""
 if tem jq; then
   session="$(printf '%s' "$payload" | jq -r '.session_id // ""' 2>/dev/null)"
   cwd="$(printf '%s' "$payload" | jq -r '.cwd // ""' 2>/dev/null)"
+  source="$(printf '%s' "$payload" | jq -r '.source // ""' 2>/dev/null)"
+  transcript="$(printf '%s' "$payload" | jq -r '.transcript_path // ""' 2>/dev/null)"
 fi
 [ -n "$cwd" ] || cwd="$PWD"
 jornada_injecao_zerar "$session"
+# Ponto de partida do detector de esforco (antes da saida da Jornada desligada).
+case "$source" in startup|resume) jornada_esforco_inicio "$session" "$transcript" ;; esac
 jornada_is_active "$session" "$(jornada_root "$cwd")" || exit 0
 
 disp=""; falta=""

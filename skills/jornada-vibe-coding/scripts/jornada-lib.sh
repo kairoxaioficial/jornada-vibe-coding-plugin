@@ -205,6 +205,79 @@ jornada_injecao_modo() {
   if printf '%s' "$((n + 1))" > "$f" 2>/dev/null; then echo curto; else echo completo; fi
 }
 
+# --- detector de esforco (FSD 9a) ---
+# Marca por sessao: tamanho do transcript no inicio do processo (o /effort vale
+# so para o processo; o que veio antes de reiniciar nao conta mais).
+jornada_esforco_marca() {
+  local slug
+  mkdir -p "$JORNADA_HOME/esforco" 2>/dev/null
+  slug="$(jornada_slug "${1:-sem-sessao}")"
+  case "$slug" in .|..) slug="sessao-$slug" ;; esac
+  printf '%s' "$JORNADA_HOME/esforco/$slug"
+}
+
+# $1 sessao, $2 transcript_path. Grava o tamanho atual do transcript; limpa marcas velhas.
+jornada_esforco_inicio() {
+  local f t n
+  f="$(jornada_esforco_marca "${1:-}")"
+  t="${2:-}"
+  n=0
+  [ -n "$t" ] && [ -f "$t" ] && n="$(wc -c < "$t" 2>/dev/null | tr -d ' ')"
+  case "$n" in ''|*[!0-9]*) n=0 ;; esac
+  printf '%s' "$n" > "$f" 2>/dev/null
+  find "$JORNADA_HOME/esforco" -type f -mtime +7 -delete 2>/dev/null
+  return 0
+}
+
+# $1 sessao, $2 transcript_path. Imprime UMA linha com o esforco e o Ultracode.
+# Nada do transcript e executado: so grep. Nunca jq no transcript (pode ter dezenas de MB).
+jornada_esforco() {
+  local session="${1:-}" t="${2:-}" f off size trecho linhas nivel="" origem="" ultra="nao detectado" u modelo st
+  if [ -n "$t" ] && [ -f "$t" ]; then
+    f="$(jornada_esforco_marca "$session")"
+    off="$(cat "$f" 2>/dev/null)"
+    size="$(wc -c < "$t" 2>/dev/null | tr -d ' ')"
+    case "$off" in ''|*[!0-9]*) off=0 ;; esac
+    case "$size" in ''|*[!0-9]*) size=0 ;; esac
+    [ "$off" -gt "$size" ] && off=0
+    # so saidas de comando local do usuario (nunca texto do modelo nem resultado de ferramenta)
+    # grep le o arquivo direto (-b da o byte inicial de cada linha; pipe de tail seria 5x mais lento no grep do macOS)
+    linhas="$(LC_ALL=C grep -a -b -F '<local-command-stdout>' < "$t" 2>/dev/null \
+      | LC_ALL=C awk -v o="$off" '{ n = index($0, ":"); if (substr($0, 1, n - 1) + 0 >= o) print substr($0, n + 1) }' \
+      | LC_ALL=C grep -a -F '"type":"user"' | LC_ALL=C grep -a -v -F '"type":"tool_result"' | LC_ALL=C grep -a -E '"(content|text)": ?"<local-command-stdout>')"
+    if [ -n "$linhas" ]; then
+      nivel="$(printf '%s\n' "$linhas" | LC_ALL=C grep -a -o -E "Set effort level to [A-Za-z0-9_-]+|set to '[A-Za-z0-9_-]+'" \
+        | sed -E "s/^Set effort level to //; s/^set to '//; s/'$//" | grep -x -E '[a-z]{1,12}' | tail -1)"
+      [ -n "$nivel" ] && origem="/effort"
+      u="$(printf '%s\n' "$linhas" | LC_ALL=C grep -a -o -E 'Ultracode (on|off)' | tail -1)"
+      case "$u" in "Ultracode on") ultra="ligado" ;; "Ultracode off") ultra="desligado" ;; esac
+    fi
+  fi
+  # 1. a variavel tem precedencia sobre o /effort
+  u="$(printf '%s' "${CLAUDE_CODE_EFFORT_LEVEL:-}" | tr '[:upper:]' '[:lower:]')"
+  if [ -n "$u" ]; then
+    case "$u" in *[!a-z]*) ;; *) if [ "${#u}" -le 12 ]; then nivel="$u"; origem="variavel CLAUDE_CODE_EFFORT_LEVEL"; fi ;; esac
+  fi
+  # 3. configuracoes
+  st="$HOME/.claude/settings.json"
+  if [ -z "$nivel" ] && [ -f "$st" ] && command -v jq >/dev/null 2>&1; then
+    modelo=""
+    if [ -n "$t" ] && [ -f "$t" ]; then
+      modelo="$(tail -c 2097152 "$t" 2>/dev/null | LC_ALL=C grep -a -F '"model":"claude-' \
+        | LC_ALL=C grep -a -o -E '"model":"claude-[A-Za-z0-9._-]+"' | tail -1 | sed -E 's/^"model":"//; s/"$//')"
+    fi
+    nivel="$(jq -r --arg m "$modelo" \
+      '(if $m == "" then null else (try .modelSettings[$m].effortLevel catch null) end) // (try .effortLevel catch null) // empty | select(type == "string")' \
+      "$st" 2>/dev/null | tr '[:upper:]' '[:lower:]' | head -1)"
+    case "$nivel" in ''|*[!a-z]*) nivel="" ;; *) [ "${#nivel}" -le 12 ] && origem="configuracoes" || nivel="" ;; esac
+  fi
+  if [ -n "$nivel" ]; then
+    printf 'Esforco da sessao: %s (%s) | Ultracode: %s' "$nivel" "$origem" "$ultra"
+  else
+    printf 'Esforco da sessao: padrao do modelo | Ultracode: %s' "$ultra"
+  fi
+}
+
 # --- registro de edicoes da sessao (para cobrar atualizacao dos documentos) ---
 jornada_edits_file() {
   local session="$1" root="$2"

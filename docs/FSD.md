@@ -96,12 +96,14 @@ Agente: `agents/jornada-executor.md` no repositório; a instalação direta copi
 
 Função `jornada_esforco` em `scripts/jornada-lib.sh`, chamada pelo `jornada-context.sh` com o `transcript_path` e o `session_id` do payload. Ordem:
 
-1. Variável `CLAUDE_CODE_EFFORT_LEVEL` definida → esse nível, origem "variavel" (a documentação diz que ela tem precedência sobre o `/effort`).
+1. Variável `CLAUDE_CODE_EFFORT_LEVEL` definida → esse nível, origem "variavel CLAUDE_CODE_EFFORT_LEVEL" (a documentação diz que ela tem precedência sobre o `/effort`). Ela substitui só o nível; o Ultracode continua vindo do histórico.
 2. Senão, o histórico da sessão a partir do ponto gravado em `esforco/<session_id>`, olhando só as saídas de comando local (texto que começa com `<local-command-stdout>`), nunca o texto do modelo nem resultado de ferramenta: o último `Set effort level to <nivel>` (ou `set to '<nivel>'`, quando a organização limita o nível) dá o nível, origem "/effort"; a última menção `Ultracode on` ou `Ultracode off` dá o Ultracode.
 3. Senão, `~/.claude/settings.json`: `modelSettings["<modelo>"].effortLevel`, com o modelo tirado do último `"model":"claude-..."` do histórico, e depois `effortLevel`; origem "configuracoes".
 4. Nada encontrado → "padrao do modelo".
 
 Sem menção no histórico, o Ultracode aparece como "nao detectado": a sessão pode ter começado com `claude --effort ultracode`, e nesse caso o próprio Claude Code avisa o modelo. O SessionStart com `source` igual a `startup` ou `resume` grava em `esforco/<session_id>` o tamanho atual do histórico, porque o `/effort` vale só para o processo e o que veio antes de reiniciar não conta mais. Limite conhecido: depois de `/clear` o histórico é novo e o detector volta às configurações até o próximo `/effort`.
+
+Implementação: `grep -a -b -F '<local-command-stdout>' < histórico` (o `-b` dá o byte inicial de cada linha; ler por pipe era cinco vezes mais lento no macOS — ERRO-005); um `awk` filtra a partir do ponto gravado, e só passam linhas com `"type":"user"`, sem `"type":"tool_result"` e com a string começando em `<local-command-stdout>`. O modelo do passo 3 é procurado só nos últimos 2 MB do histórico. Medido: cerca de 200 ms num histórico de 20 MB; nos históricos reais desta máquina (7 e 9 MB) a linha saiu certa: `max (/effort) | Ultracode: ligado`.
 
 Formato conferido no código do Claude Code instalado em 17/10/2026: `Set effort level to <nivel> (this session only): <descricao>`, com ` · Ultracode on` ou ` · Ultracode off` no fim quando o Ultracode muda.
 
@@ -150,6 +152,7 @@ PRD.md DECISOES_TECNICAS.md INSUMOS.md CLAUDE.md README.md INSTALAR.md METODOLOG
 9. (1.2.1) Agente com `effort: high`; guia de roteamento com a lista de ângulos, a política do Ultracode, a auditoria antes de publicar, o ciclo do executor e o paralelismo seguro; SKILL.md mandando usar a ferramenta Workflow só com o ok do usuário.
 10. (1.2.1) Detector de esforço: nível e Ultracode lidos só de saída de comando local; o texto do modelo não conta; o SessionStart de início ignora o `/effort` anterior; variável e configurações como reserva.
 11. (1.2.1) Linha de esforço nos dois blocos; bloco curto ainda abaixo de 1.500 bytes.
+12. (1.2.1) Notificação de tarefa e caminhos com `jornada-vibe-coding` não ligam nem desligam a Jornada; `/jornada-vibe-coding off` digitado desliga.
 
 Teste real (fora do script, 16/10/2026): sessão `claude -p --model opus` numa pasta temporária pediu ao `jornada-executor` uma etapa de um arquivo; `modelUsage` do resultado mostrou `claude-opus-5-5` (sessão principal) e `claude-sonnet-5-5` (executor), o arquivo foi criado e o relatório veio no formato do agente.
 
@@ -159,6 +162,8 @@ Teste real (fora do script, 16/10/2026): sessão `claude -p --model opus` numa p
 - Arquivos de estado: nome derivado do `session_id`/raiz com `/` trocado por `-`, sempre dentro de `$JORNADA_HOME`.
 - Nenhum segredo é lido, gravado ou enviado.
 - O executor não faz commit nem push; quem publica é a sessão principal, depois da revisão.
+- (1.2.1) Ligar e desligar a Jornada só vale para texto do usuário: notificações de tarefas em segundo plano (`<task-notification>`) e caminhos de arquivo com `jornada-vibe-coding` não contam (ERRO-006). Sem isso, um relatório de agente que citasse `/jornada-vibe-coding off` desligaria as travas.
+- (1.2.1) O detector de esforço só extrai texto do histórico com grep; o nível impresso é filtrado para letras minúsculas (até 12), o modelo vai ao jq como argumento e a marca da sessão fica sempre dentro de `$JORNADA_HOME` (`.` e `..` viram `sessao-.` e `sessao-..`).
 
 ## 15. Não se aplica
 
