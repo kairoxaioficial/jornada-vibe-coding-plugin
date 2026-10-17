@@ -33,7 +33,7 @@ Depois da etapa 6: revisão de segurança dos scripts (Passo 5) e documentação
 
 Pedido do usuário (17/10/2026), depois da análise da noite de 16 para 17/10 no projeto ARCA, que consumiu cerca de 43% do limite semanal numa noite: a Jornada deve pesquisar e planejar por todos os ângulos com o Opus 5.5 (com Ultracode nas frentes grandes), executar com o Sonnet 5.5 e auditar com o Opus 5.5 e o Ultracode antes de publicar; e cuidar do esforço, ou pelo menos analisar e pedir ao usuário para subir ou baixar.
 
-Escolhas do usuário na mesma data: executor em `high` por padrão e `xhigh` nas etapas difíceis; Ultracode só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado.
+Escolhas do usuário na mesma data: executor em `high` por padrão e `xhigh` nas etapas difíceis; Ultracode só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado. Depois, também na mesma data: `max` nas etapas mais complexas, em vez do `xhigh` (etapa 9b).
 
 ## Etapas
 
@@ -42,6 +42,7 @@ Escolhas do usuário na mesma data: executor em `high` por padrão e `xhigh` nas
 | 7 | Documentos da 1.2.1 | PRD, decisões, FSD, plano e status descrevem a nova versão antes de qualquer código | Documentos atualizados e commit | em andamento |
 | 8 | Regras novas da metodologia | O executor ganha esforço próprio e a regra do teste que reprova sem a mudança; o guia de roteamento ganha a lista de ângulos, o Ultracode com pergunta antes, a auditoria antes de publicar e o paralelismo seguro; o SKILL.md resume tudo | Agente com `effort: high`; guia e SKILL.md com as seções novas; testes passam | pendente |
 | 9 | Aviso de esforço no hook | O bloco injetado mostra o esforço e o Ultracode da sessão e as regras de quando pedir para mudar | Testes do detector (/effort, Ultracode, reinício, configurações) passam; bloco curto abaixo de 1.500 bytes | pendente |
+| 9b | Esforço máximo nas etapas mais complexas | Nas etapas mais complexas o executor usa `max` em vez de `xhigh`, e uma etapa `xhigh` que falhou ganha uma nova tentativa em `max` antes de o Opus assumir | Regras, guia, SKILL.md e bloco injetado com o nível `max`; testes passam | concluída |
 | 10 | Instalar, publicar e conferir (1.2.1) | Versão 1.2.1 instalada na máquina e no GitHub, documentação de uso atualizada | Cópia instalada igual ao repositório; push feito; testes passam | pendente |
 
 Depois da etapa 10: revisão de segurança dos scripts alterados (Passo 5) e documentação final (Passo 6), registradas no STATUS.

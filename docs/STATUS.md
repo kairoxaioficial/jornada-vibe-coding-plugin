@@ -17,6 +17,7 @@
 | 7 | Documentos da 1.2.1 | concluída | 17/10/2026 | ver git log |
 | 8 | Regras novas da metodologia | concluída | 17/10/2026 | ver git log |
 | 9 | Aviso de esforço no hook | concluída | 17/10/2026 | ver git log |
+| 9b | Esforço máximo nas etapas mais complexas | concluída | 17/10/2026 | ver git log |
 | 10 | Instalar, publicar e conferir (1.2.1) | em andamento | 17/10/2026 | — |
 
 ## Detalhamento das etapas
@@ -79,6 +80,13 @@
 - Arquivos: `scripts/jornada-lib.sh` (`jornada_esforco_marca`, `jornada_esforco_inicio`, `jornada_esforco`), `scripts/jornada-context.sh` (lê `transcript_path`; linha de esforço nos dois blocos; P4, P5 e P6 com as regras da 1.2.1; linha "ESFORCO E ULTRACODE"; ligar e desligar só por texto do usuário), `scripts/verificar-ferramentas.sh` (ponto de partida do detector no início e na retomada do processo), `tests/testar-hooks.sh` (18 testes novos), `docs/ERROS.md` (ERRO-005 e ERRO-006), `docs/FSD.md` (seção 9a com a implementação, testes 12, segurança), `DECISOES_TECNICAS.md` (decisão 16), `PRD.md` (critério de aceitação).
 - Testes: `bash tests/testar-hooks.sh` → 61 testes, 0 falhas. Bloco curto com 988 bytes. Detector em histórico sintético de 20 MB: cerca de 200 ms. Nos históricos reais desta máquina (7 e 9 MB), a linha saiu `Esforco da sessao: max (/effort) | Ultracode: ligado`, que é o estado real das duas sessões. Conferência dos testes novos sem a mudança: o executor desfez cada trecho e viu reprovar; o Opus desfez a correção do ERRO-006 e viu os 3 testes dela reprovarem, depois restaurou.
 - Erros: ERRO-005 (detector lento por pipe no macOS) e ERRO-006 (notificação de tarefa ligava a Jornada), corrigidos.
+- Próxima etapa: 10 — instalar, publicar e conferir.
+
+### Etapa 9b — Esforço máximo nas etapas mais complexas (17/10/2026)
+- Pedido do usuário: "em vez do xhigh ele poderia usar o max nas mais complexas". Ficou em três níveis: `high` por padrão; `xhigh` nas etapas difíceis; `max` nas mais complexas (duas ou mais dificuldades juntas, ou máquina de estados com cinco ou mais estados) e na nova tentativa, num executor novo, de uma etapa `xhigh` que voltou sem sucesso depois das rodadas de ajuste. O `max` não virou padrão porque a documentação do Claude Code avisa que ele tem retorno decrescente e tende a pensar demais.
+- Arquivos: `scripts/jornada-context.sh` (P5 do bloco completo e resumo do bloco curto), `SKILL.md` (P5 e seção ESFORÇO E ULTRACODE), `references/roteamento-modelos.md` (quem faz o quê, quando não delegar, ordem de serviço, tabela de esforço, escalonamento, como chamar), `PRD.md`, `DECISOES_TECNICAS.md` (decisão 18), `docs/FSD.md` (item 7 do roteamento), `docs/PLANO.md` (etapa 9b), `tests/testar-hooks.sh` (1 teste novo).
+- Testes: `bash tests/testar-hooks.sh` → 62 testes, 0 falhas; bloco curto com 1.012 bytes; SKILL.md com 47.838 bytes. O teste novo reprova na versão anterior (o guia não tinha `effort: "max"`).
+- Erros: nenhum.
 - Próxima etapa: 10 — instalar, publicar e conferir.
 
 ### Revisão de segurança dos scripts (Passo 5) — 16/10/2026

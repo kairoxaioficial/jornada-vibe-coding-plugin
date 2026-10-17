@@ -79,6 +79,7 @@ done
 if [ -z "$faltam" ]; then ok "guia de roteamento com as regras da 1.2.1"; else falha "guia de roteamento com as regras da 1.2.1:$faltam"; fi
 if grep -qF 'ferramenta **Workflow**' "$S/../SKILL.md" && grep -qF '/effort ultracode off' "$S/../SKILL.md"; then ok "SKILL.md com a politica do Ultracode e do esforco"; else falha "SKILL.md com a politica do Ultracode e do esforco"; fi
 if grep -qF 'reprova sem a mudança' "$AG"; then ok "executor confere teste que reprova sem a mudanca"; else falha "executor confere teste que reprova sem a mudanca"; fi
+if grep -qF 'effort: "max"' "$RT" && contem "$saida" 'effort "max"'; then ok "max nas etapas mais complexas (guia e bloco)"; else falha "max nas etapas mais complexas (guia e bloco)"; fi
 
 # 6. SessionStart e prompt calados com a Jornada desligada
 rm -f "$JORNADA_HOME/global-on"

@@ -18,7 +18,7 @@
 | Lista de ângulos (toda etapa) | Opus |
 | Planejamento por ângulos de frente grande ou arriscada (com o ok do usuário) | Workflow: um agente Opus por grupo de ângulos; síntese no Opus |
 | Ordem de serviço da etapa | Opus (modelo abaixo) |
-| P5 Implementar a etapa | Executor Sonnet (`jornada-executor`), em `high`; `xhigh` nas etapas difíceis |
+| P5 Implementar a etapa | Executor Sonnet (`jornada-executor`), em `high`; `xhigh` nas etapas difíceis; `max` nas mais complexas |
 | P6 Testes automatizados | Executor escreve, roda e confere que cada teste novo reprova sem a mudança; o Opus roda de novo na revisão |
 | P6 Validação visual (screenshot desktop e na menor largura do DESIGN, 360 ou 375 px) | Opus — é julgamento de beleza e de facilidade de uso |
 | Revisão do diff | Opus (checklist abaixo) |
@@ -32,7 +32,7 @@
 - Mudança pequena: até ~30 linhas em até 2 arquivos — delegar custaria mais do que fazer.
 - Código sensível de segurança: autenticação, sessão, permissões/RLS, criptografia, pagamento, segredos, upload de arquivo.
 - Documentos da metodologia (PRD, FSD, DECISOES_TECNICAS, DESIGN, PLANO, STATUS).
-- Depois de 2 rodadas de correção sem sucesso do executor.
+- Depois de 2 rodadas de correção sem sucesso do executor (numa etapa em `xhigh`, antes disso vem uma nova tentativa em `max` — seção Ciclo do executor).
 - Quando a etapa depende de uma decisão do usuário: perguntar ao usuário primeiro, delegar depois.
 
 ## Lista de ângulos (toda etapa, antes da ordem de serviço)
@@ -63,7 +63,7 @@ ORDEM DE SERVIÇO — Etapa N: <nome>   (projeto: <raiz>)
 7. Segurança: <entradas a validar; autorização exigida; segredos por variável de ambiente; riscos desta etapa>
 8. Ângulos: <os 10 da lista — requisito, ou "não se aplica — motivo">
 9. Testes obrigatórios: <casos: feliz, borda, erro, permissão>; cada teste novo reprova sem a mudança; comandos: <lint, typecheck, testes, build>
-10. Esforço: high | xhigh — <motivo, se xhigh>
+10. Esforço: high | xhigh | max — <motivo, se não for high>
 11. Paralelo: não | sim — <arquivos exclusivos, números reservados, banco de ensaio>
 12. Fora do escopo: <o que não fazer>
 13. Pronto quando: <critérios que dá para conferir>
@@ -78,10 +78,11 @@ Quanto mais exata a ordem de serviço, melhor o resultado: o executor não adivi
 | Conversa principal (Opus) | `high` | Comando do usuário (`/effort high`). A Jornada não muda: lê a linha `Esforco da sessao` do bloco injetado e pede, uma vez, quando não combina |
 | Executor (`jornada-executor`) | `high` | Fixado no agente (`effort: high`) |
 | Executor em etapa difícil | `xhigh` | Parâmetro `effort: "xhigh"` na chamada Agent. Etapa difícil: migration ou dado de produção, concorrência e travas, integração externa, partes de permissão ou pagamento fora do núcleo sensível (o núcleo fica com o Opus) |
+| Executor em etapa mais complexa | `max` | Parâmetro `effort: "max"` na chamada Agent. Mais complexa: junta duas ou mais dificuldades da linha de cima (ex.: migration em produção com concorrência), é uma máquina de estados com cinco ou mais estados (aprovar, reprovar, cancelar, repetir, renascer…), ou é a nova tentativa de uma etapa em `xhigh` que voltou sem sucesso |
 | Agentes de ângulos e revisores (workflow) | `high`, modelo `opus` | Opções `model` e `effort` do agente no script do workflow |
 | Buscas e verificadores (workflow) | `medium`, modelo `sonnet` | Opções `model` e `effort` do agente no script do workflow |
 
-- `max` só quando o usuário escolher, para um problema muito difícil: a documentação do Claude Code avisa que ele tem retorno decrescente e tende a pensar demais.
+- `max` no executor só nos casos da tabela; na conversa principal, só por escolha do usuário. A documentação do Claude Code avisa que ele tem retorno decrescente e tende a pensar demais — por isso nunca é o padrão.
 - Quando pedir ao usuário: etapa comum com a linha dizendo `max` ou `Ultracode: ligado` → uma vez: "`/effort ultracode off` e depois `/effort high`" (quando desliga, a resposta do `/effort` termina em "· Ultracode off"). Se o usuário mantiver, respeitar e não repetir.
 
 ## Ultracode — workflows com vários agentes
@@ -121,6 +122,7 @@ No ARCA, as quatro auditorias acharam 54 defeitos novos (1 grave, cerca de 20 m�
 
 - Um executor novo para cada etapa, com a ordem de serviço inteira no `prompt`.
 - `SendMessage` ao mesmo executor só para as até 2 rodadas de ajuste da mesma etapa; depois o Opus assume.
+- Escalonamento: numa etapa em `xhigh` que continua sem sucesso depois das 2 rodadas, antes de o Opus assumir vem uma nova tentativa num executor novo em `max`, com a ordem de serviço e o relatório da falha.
 - Nunca manter um executor vivo entre etapas nem esperando auditoria: o contexto dele cresce e cada passo relê tudo (no ARCA, agentes vivos a noite toda chegaram a 965 mil tokens de contexto).
 - Consertos pedidos pela auditoria vão para um executor novo, com a lista de defeitos e os pontos do código — não com o histórico.
 
@@ -137,7 +139,7 @@ Leitura e auditoria sem escrita podem rodar em paralelo à vontade. No ARCA, os 
 
 ## Como chamar
 
-- Ferramenta Agent com `subagent_type: "jornada-executor"` (instalado como plugin: `jornada-vibe-coding:jornada-executor`) e a ordem de serviço inteira no `prompt`. Etapa difícil: acrescentar `effort: "xhigh"`.
+- Ferramenta Agent com `subagent_type: "jornada-executor"` (instalado como plugin: `jornada-vibe-coding:jornada-executor`) e a ordem de serviço inteira no `prompt`. Etapa difícil: acrescentar `effort: "xhigh"`; etapa mais complexa: `effort: "max"`.
 - Um executor por etapa (seção Ciclo do executor).
 - Etapas independentes podem ir para executores em paralelo, na mesma mensagem, só no modo seguro (seção Paralelismo seguro).
 
