@@ -102,6 +102,17 @@ com="$(prompt s5 "x")"
 if contem "$sem" "CAVEMAN (SEMPRE ATIVO" && ! contem "$com" "CAVEMAN (SEMPRE ATIVO" && contem "$com" "NUNCA comprimir o que fica gravado"; then
   ok "regras do caveman so sem o plugin"; else falha "regras do caveman so sem o plugin"; fi
 
+# 9. SKILL.md enxuto: cada ponteiro para references/detalhes-skill.md acha a secao
+SK="$S/../SKILL.md"; DT="$S/../references/detalhes-skill.md"
+secoes="$(grep 'detalhes-skill.md` →' "$SK" | sed 's/.*detalhes-skill.md` → //' | grep -o '"[^"]*"' | tr -d '"')"
+faltam=""
+while IFS= read -r h; do [ -n "$h" ] && ! grep -qF -- "$h" "$DT" && faltam="$faltam [$h]"; done <<EOF
+$secoes
+EOF
+if [ -n "$secoes" ] && [ -z "$faltam" ]; then ok "ponteiros do SKILL.md resolvem ($(printf '%s\n' "$secoes" | wc -l | tr -d ' ') secoes)"; else falha "ponteiros do SKILL.md resolvem:$faltam"; fi
+tam="$(wc -c < "$SK" | tr -d ' ')"
+if [ "$tam" -lt 50000 ]; then ok "SKILL.md com menos de 50 KB ($tam bytes)"; else falha "SKILL.md com menos de 50 KB ($tam bytes)"; fi
+
 echo
 echo "$total testes, $falhas falhas"
 [ "$falhas" -eq 0 ]

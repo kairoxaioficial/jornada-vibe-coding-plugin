@@ -11,7 +11,7 @@
 | 2 | Tirar o ponytail | concluída | 16/10/2026 | ver git log |
 | 3 | Opus planeja, Sonnet executa | concluída | 16/10/2026 | ver git log |
 | 4 | Menos texto repetido a cada mensagem | concluída | 16/10/2026 | ver git log |
-| 5 | SKILL.md mais leve | pendente | — | — |
+| 5 | SKILL.md mais leve | concluída | 16/10/2026 | ver git log |
 | 6 | Instalar, publicar e conferir | pendente | — | — |
 
 ## Detalhamento das etapas
@@ -40,6 +40,14 @@
 - Medição (projeto de teste com documentos completos e plugin caveman instalado): bloco antigo 6.212 bytes em toda mensagem; novo bloco completo 7.288 bytes (1ª mensagem e a cada 10) e bloco curto 755 bytes nas demais — em 10 mensagens, de ~62 KB para ~14 KB de texto injetado (~77% menos). SessionStart: de ~2,5 KB para uma linha (~300 bytes) quando nada falta.
 - Erros: nenhum.
 - Próxima etapa: 5 — SKILL.md mais leve.
+
+### Etapa 5 — SKILL.md mais leve (16/10/2026)
+- Arquivos: `SKILL.md` (61.233 → 45.002 bytes, −26%), `references/detalhes-skill.md` (novo, 20 KB: R10 deploy, Passo 6 documentação final, Passo 7 deploy com comandos, ferramentas de economia em detalhe, prompts verbatim chave, templates, estrutura de pastas, extras), `tests/testar-hooks.sh` (2 testes novos).
+- Como foi feito: script que corta as seções pelo título (fora de blocos de código) e cola o texto igual no arquivo de referência; no SKILL.md fica um resumo de 1 a 5 linhas com ponteiro para a seção exata.
+- Testes: conferência por script → 0 linhas do SKILL.md antigo perdidas (todas estão no SKILL.md novo ou no `detalhes-skill.md`); `bash tests/testar-hooks.sh` → 38 testes, 0 falhas (os 8 ponteiros acham a seção; SKILL.md abaixo de 50 KB).
+- Mantidos no SKILL.md por pesarem no resultado: Passo 1 Design System, cold start, matriz de impacto, protocolo, roteamento de modelos, regras R1–R9, fluxos especiais.
+- Erros: nenhum.
+- Próxima etapa: 6 — instalar, publicar e conferir.
 
 ## Checklist completo — todas as etapas
 
