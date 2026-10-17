@@ -11,8 +11,17 @@ Ao ativar, o Claude passa a trabalhar sempre da mesma forma: primeiro entende e 
 - **Skill `jornada-vibe-coding`** — a metodologia completa, com os prompts de cada fase.
 - **Skill `estruturar-projeto`** — cria toda a estrutura de documentos em um projeto novo ou já existente.
 - **Templates** — `PRD.md`, `DECISOES_TECNICAS.md`, `FSD.md`, `INSUMOS.md`, `DESIGN.md`, `PLANO.md`, `STATUS.md`, `ERROS.md`, `CHECKLIST.md`, `CLAUDE.md`.
+- **Subagente `jornada-executor`** (Sonnet) — implementa cada etapa a partir da ordem de serviço escrita pelo Opus, testa e devolve um relatório curto; o Opus revisa antes do commit.
 - **Hooks** — mantêm a metodologia ativa durante toda a sessão, impedem que o Claude comece a mexer no código antes de os documentos existirem e conferem, a cada sessão, se as ferramentas de economia de tokens estão instaladas.
-- **`scripts/instalar-ferramentas.sh`** — instala as sete ferramentas obrigatórias de economia de tokens.
+- **`scripts/instalar-ferramentas.sh`** — instala as nove ferramentas obrigatórias de economia de tokens.
+
+## Novidades da versão 1.2.0
+
+- **O Opus planeja, o Sonnet executa.** A sessão principal (Opus) lê o código pelo grafo, escreve os documentos, planeja a etapa e escreve uma *ordem de serviço* detalhada (arquivos, contratos, regras, interface, segurança, testes, critério de pronto). O subagente `jornada-executor` (Sonnet) implementa e testa; o Opus revisa o diff, roda os testes de novo e confere a tela antes do commit. Mudança pequena, código sensível de segurança e documentos ficam com o Opus. Escrever código é o que mais consome tokens; no Sonnet ele custa metade por token (Opus 5.5: US$ 4/20 por milhão de tokens de entrada/saída; Sonnet 5.5: US$ 2/10) e roda num contexto pequeno, e a sessão do Opus fica enxuta. Detalhes: [`references/roteamento-modelos.md`](skills/jornada-vibe-coding/references/roteamento-modelos.md).
+- **Menos texto repetido.** O protocolo completo vai na primeira mensagem, ao ativar, depois de compactar e a cada 10 comandos; nas outras mensagens vai um lembrete curto (cerca de 77% menos texto injetado).
+- **SKILL.md 26% menor.** Detalhes de fases raras (deploy, documentação final, extras) ficam em `references/detalhes-skill.md`, lidos quando a fase chega.
+- **Sem ponytail.** Com a metodologia ativa vale o padrão de qualidade de produto do FSD e do DESIGN.
+- **Testes dos hooks:** `bash tests/testar-hooks.sh`.
 
 ## Ferramentas obrigatórias de economia de tokens
 
@@ -64,7 +73,7 @@ Não depende de o Claude "lembrar":
 - **Obriga o uso em todo passo.** Enquanto a metodologia estiver ativa, ler código direto (`Read`, `Grep`, `Glob` ou `cat`/`sed`/`grep` no terminal) fica **bloqueado** até o mapeamento pelo grafo ser feito. A trava cai na primeira chamada de `tokensave` ou `code-review-graph` na sessão. Documentos, configs e imagens passam sempre.
 - **caveman fica sempre ligado.** Se o plugin não estiver instalado, as regras dele são injetadas pelos hooks; com o plugin instalado, o hook só acrescenta a regra própria da metodologia (documentos, checklists e commits em português normal). O nível do caveman (`full`) é gravado automaticamente em `~/.claude/.caveman-active` se ainda não existir.
 - **Documentos nunca ficam para trás.** Toda alteração de código passa pela matriz de impacto (funcionalidade → `PRD.md`; tabela ou rota → `docs/FSD.md`; biblioteca ou banco → `DECISOES_TECNICAS.md`; variável de ambiente → `INSUMOS.md`; visual → `docs/DESIGN.md`; sempre → `docs/STATUS.md` e `docs/ERROS.md`). O hook `Stop` **não deixa a sessão encerrar** se o código mudou e o `STATUS.md` não foi atualizado.
-- **Várias ferramentas por passo, não uma.** Consultas independentes vão na mesma mensagem, em paralelo — duas consultas de grafo custam menos que ler um arquivo. A tabela de combinações por passo está em `skills/jornada-vibe-coding/SKILL.md`.
+- **Várias ferramentas por passo, não uma.** Consultas independentes vão na mesma mensagem, em paralelo — duas consultas de grafo custam menos que ler um arquivo. O resumo por passo está em `skills/jornada-vibe-coding/SKILL.md` e a tabela completa em `skills/jornada-vibe-coding/references/detalhes-skill.md`.
 
 As regras de uso de cada ferramenta estão em `skills/jornada-vibe-coding/references/ferramentas-token.md`.
 

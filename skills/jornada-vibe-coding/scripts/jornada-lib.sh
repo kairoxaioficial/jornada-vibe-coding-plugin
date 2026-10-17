@@ -144,9 +144,10 @@ jornada_ativar_caveman() {
   return 0
 }
 
-# Plugin caveman instalado? Ele mesmo injeta as regras de compressao em todo prompt.
+# Plugin caveman instalado e nao desligado? Ele mesmo injeta as regras de compressao em todo prompt.
 jornada_caveman_plugin() {
-  grep -q '"caveman@' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null
+  grep -q '"caveman@' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null || return 1
+  ! grep -q '"caveman@[^"]*"[[:space:]]*:[[:space:]]*false' "$HOME/.claude/settings.json" 2>/dev/null
 }
 
 # Regras sempre ativas do bloco completo. As regras gerais do caveman so entram

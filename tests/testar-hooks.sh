@@ -101,6 +101,9 @@ printf '{"plugins":{"caveman@caveman":[]}}' > "$HOME/.claude/plugins/installed_p
 com="$(prompt s5 "x")"
 if contem "$sem" "CAVEMAN (SEMPRE ATIVO" && ! contem "$com" "CAVEMAN (SEMPRE ATIVO" && contem "$com" "NUNCA comprimir o que fica gravado"; then
   ok "regras do caveman so sem o plugin"; else falha "regras do caveman so sem o plugin"; fi
+printf '{"enabledPlugins":{"caveman@caveman": false}}' > "$HOME/.claude/settings.json"
+if contem "$(prompt s6 "x")" "CAVEMAN (SEMPRE ATIVO"; then ok "plugin caveman desligado: regras voltam"; else falha "plugin caveman desligado: regras voltam"; fi
+rm -f "$HOME/.claude/settings.json"
 
 # 9. SKILL.md enxuto: cada ponteiro para references/detalhes-skill.md acha a secao
 SK="$S/../SKILL.md"; DT="$S/../references/detalhes-skill.md"

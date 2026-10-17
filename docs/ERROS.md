@@ -21,6 +21,16 @@
 | 1 | ERRO-001 | 16/10/2026 | 2 | Teste "sem ponytail" acusou o nome da função da regra | corrigido |
 | 2 | ERRO-002 | 16/10/2026 | 3 | `instalar.sh` registrava a trava de leitura sem o `Bash` | corrigido |
 | 3 | ERRO-003 | 16/10/2026 | 3 | Teste "sem ponytail" acusou a nova seção do SKILL.md | corrigido |
+| 4 | ERRO-004 | 16/10/2026 | 6 | Comando `timeout` não existe no macOS (teste real do executor) | corrigido |
+
+### ERRO-004: comando `timeout` não existe no macOS
+- **Data:** 16/10/2026
+- **Etapa:** 6 — teste real do executor numa sessão `claude -p`
+- **Erro exato:** `(eval):1: command not found: timeout` (saída 127)
+- **Causa:** `timeout` é do GNU coreutils; o macOS não traz.
+- **Correção:** o teste rodou sem `timeout`, em segundo plano, com o limite de tempo da própria ferramenta.
+- **Como evitar:** em scripts para macOS, não depender de `timeout`; usar `gtimeout` só se o coreutils estiver instalado.
+- **Status:** corrigido
 
 ### ERRO-002: `instalar.sh` registrava a trava de leitura sem o `Bash`
 - **Data:** 16/10/2026

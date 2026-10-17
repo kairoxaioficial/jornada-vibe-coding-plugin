@@ -63,7 +63,9 @@ Ligar não é uma sugestão que a IA pode esquecer no meio da conversa: enquanto
 
 Toda vez que você escreve qualquer coisa — de "cria um sistema de pedidos" até "muda essa cor para azul" — o mesmo protocolo roda:
 
-**P0 — Ferramentas.** Confere as sete ferramentas de economia de tokens e baixa em segundo plano as que faltarem. Você não faz nada.
+O protocolo inteiro chega para a IA na primeira mensagem, ao ligar a metodologia, depois que a conversa é compactada e a cada 10 mensagens; nas outras, chega um lembrete curto com as regras que não podem falhar. As regras valem do mesmo jeito — só não são repetidas por inteiro a cada mensagem, o que economiza contexto.
+
+**P0 — Ferramentas.** Confere as nove ferramentas de economia de tokens e baixa em segundo plano as que faltarem. Você não faz nada.
 
 **P1 — Ler com economia.** Antes de opinar ou editar, a IA mapeia o projeto pelo grafo de código (`tokensave`, `code-review-graph`) em vez de abrir arquivo por arquivo. Enquanto isso não acontece, ler código direto fica bloqueado.
 
@@ -73,9 +75,9 @@ Toda vez que você escreve qualquer coisa — de "cria um sistema de pedidos" at
 
 **P4 — Planejar.** A tarefa entra em `docs/PLANO.md` dividida em etapas, e a etapa atual é aberta em `docs/STATUS.md`.
 
-**P5 — Executar UMA etapa.** Uma por comando. Nada de construir cinco coisas de uma vez, nada de usar tecnologia que não está no FSD.
+**P5 — Executar UMA etapa.** Uma por comando. Nada de construir cinco coisas de uma vez, nada de usar tecnologia que não está no FSD. Quem escreve o código é um ajudante no modelo Sonnet (`jornada-executor`), a partir de uma *ordem de serviço* detalhada que o Opus escreveu; mudanças pequenas e código sensível de segurança o próprio Opus faz.
 
-**P6 — Testar de verdade.** Lint, tipos, testes, build, migrations, subir o servidor. Se tem tela, screenshot e conferência no celular. *Sistema criado não é sistema testado.*
+**P6 — Testar de verdade.** Lint, tipos, testes, build, migrations, subir o servidor. Se tem tela, screenshot e conferência no celular. O Opus revisa o que o ajudante fez e roda os testes de novo antes do commit. *Sistema criado não é sistema testado.*
 
 **P7 — Registrar.** `STATUS.md` recebe a etapa, os arquivos alterados, os testes e o resultado. `ERROS.md` recebe todo erro que apareceu, mesmo os já corrigidos — e é consultado **antes** de tentar corrigir um erro novo.
 

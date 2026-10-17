@@ -68,7 +68,7 @@ Todas as funções comuns ficam em `skills/jornada-vibe-coding/scripts/jornada-l
 
 **Bloco curto** — raiz do projeto, estado dos documentos, aviso de `AGENTS.md` se houver, e uma linha com as regras que não podem falhar (grafo antes de ler, documentos antes do código, uma etapa por comando, Opus planeja/revisa e o executor Sonnet implementa, testar de verdade, STATUS/ERROS, matriz de impacto, checklists, ponytail desligado). Enviado nos demais comandos.
 
-Regra de compressão: com o plugin caveman instalado (`caveman@` em `~/.claude/plugins/installed_plugins.json`), o bloco leva só a regra própria da metodologia (documentos, checklists e commits em prosa normal); sem o plugin, leva o texto completo das regras de compressão.
+Regra de compressão: com o plugin caveman instalado (`caveman@` em `~/.claude/plugins/installed_plugins.json`) e não desligado (`"caveman@...": false` em `enabledPlugins` do `~/.claude/settings.json` conta como desligado), o bloco leva só a regra própria da metodologia (documentos, checklists e commits em prosa normal); sem o plugin, leva o texto completo das regras de compressão.
 
 Se a marca não puder ser lida ou gravada, o hook manda o bloco completo (falha para o lado seguro).
 
@@ -123,6 +123,11 @@ PRD.md DECISOES_TECNICAS.md INSUMOS.md CLAUDE.md README.md INSTALAR.md METODOLOG
 3. SessionStart calado quando a Jornada está desligada.
 4. Trava de edição nega código sem documentos e libera documento.
 5. Sintaxe de todos os scripts (`bash -n`).
+6. Agente `jornada-executor` com `model: sonnet`; protocolo e SKILL.md apontando para ele; `instalar.sh` copiando os agentes.
+7. Regras do caveman só sem o plugin (ou com o plugin desligado).
+8. Cada ponteiro do SKILL.md para `references/detalhes-skill.md` acha a seção; SKILL.md abaixo de 50 KB.
+
+Teste real (fora do script, 16/10/2026): sessão `claude -p --model opus` numa pasta temporária pediu ao `jornada-executor` uma etapa de um arquivo; `modelUsage` do resultado mostrou `claude-opus-5-5` (sessão principal) e `claude-sonnet-5-5` (executor), o arquivo foi criado e o relatório veio no formato do agente.
 
 ## 14. Segurança
 

@@ -12,7 +12,7 @@
 | 3 | Opus planeja, Sonnet executa | concluída | 16/10/2026 | ver git log |
 | 4 | Menos texto repetido a cada mensagem | concluída | 16/10/2026 | ver git log |
 | 5 | SKILL.md mais leve | concluída | 16/10/2026 | ver git log |
-| 6 | Instalar, publicar e conferir | pendente | — | — |
+| 6 | Instalar, publicar e conferir | concluída | 16/10/2026 | ver git log |
 
 ## Detalhamento das etapas
 
@@ -49,10 +49,32 @@
 - Erros: nenhum.
 - Próxima etapa: 6 — instalar, publicar e conferir.
 
+### Etapa 6 — Instalar, publicar e conferir (16/10/2026)
+- Arquivos: `.claude-plugin/plugin.json` (1.2.0), `README.md` (novidades da 1.2.0, subagente, nove ferramentas), `METODOLOGIA.md` (bloco completo/curto, executor no P5/P6), `scripts/jornada-lib.sh` (plugin caveman desligado conta como ausente), `tests/testar-hooks.sh` (1 teste novo), `docs/FSD.md`, `docs/PLANO.md`, `docs/ERROS.md`.
+- Instalação: `bash instalar.sh` na máquina do usuário → `~/.claude/skills/jornada-vibe-coding`, `~/.claude/skills/estruturar-projeto` e `~/.claude/agents/jornada-executor.md` idênticos ao repositório (`diff -rq` sem diferença); backup do `settings.json` criado; nenhum hook duplicado (7 hooks da Jornada).
+- Testes: `bash tests/testar-hooks.sh` → 39 testes, 0 falhas. Hooks instalados com sessão descartável: 1ª mensagem bloco completo (7.267 bytes), 2ª bloco curto (734 bytes), SessionStart de compactação com uma linha, mensagem seguinte completo de novo. Teste real `claude -p --model opus` pedindo ao `jornada-executor` uma etapa de um arquivo: `modelUsage` com `claude-opus-5-5` e `claude-sonnet-5-5`, arquivo criado, relatório no formato do agente (custo do teste: US$ 0,61).
+- Erros: ERRO-004 (corrigido).
+
+### Revisão de segurança dos scripts (Passo 5) — 16/10/2026
+- Texto do prompt só é comparado em `case`, nunca executado nem interpolado em comando.
+- Arquivos de estado novos (`injecao/`) ficam dentro de `$JORNADA_HOME`; o nome vem do `session_id` com `/` trocado por `-`, então não sai da pasta.
+- `JORNADA_REFORCO` é validado (só dígitos; senão 10) antes de entrar em conta aritmética.
+- O contador ilegível ou impossível de gravar faz o hook mandar o bloco completo (falha para o lado seguro).
+- O executor não faz commit, push nem altera histórico; quem publica é a sessão principal depois da revisão.
+- Nenhum segredo lido, gravado ou enviado. Resultado: nada a corrigir.
+
+### Documentação final (Passo 6) — 16/10/2026
+- `README.md`, `INSTALAR.md`, `METODOLOGIA.md`, `CLAUDE.md` e os documentos da metodologia descrevem a versão 1.2.0.
+
 ## Checklist completo — todas as etapas
 
-(vazio)
+1. Documentos do repositório: abrir o repositório → existem `PRD.md`, `DECISOES_TECNICAS.md`, `INSUMOS.md` e `docs/` com FSD, DESIGN, PLANO, STATUS e ERROS.
+2. Sem ponytail: pedir qualquer coisa com a Jornada ligada → a resposta não fala em "o mínimo que funciona"; o bloco da metodologia diz "PONYTAIL DESLIGADO".
+3. Opus planeja, Sonnet executa: pedir uma etapa de código num projeto com documentos → o Claude escreve uma ordem de serviço e chama o `jornada-executor`; depois revisa e faz o commit.
+4. Menos texto repetido: mandar duas mensagens seguidas → a primeira recebe o bloco completo e a segunda o bloco curto.
+5. SKILL.md mais leve: abrir `skills/jornada-vibe-coding/SKILL.md` → seções de deploy, documentação final e extras apontam para `references/detalhes-skill.md`, onde o texto completo está.
+6. Instalado e publicado: `bash tests/testar-hooks.sh` → "0 falhas"; versão 1.2.0 no GitHub.
 
 ## Próximos passos
 
-(vazio)
+- PENDENTE - confirmar com o usuário: levar as mesmas mudanças para a skill `ia5k` e para a versão Codex (`~/.agents/skills/jornada-ia-vibe-coding-codex`), que ainda citam o ponytail.
