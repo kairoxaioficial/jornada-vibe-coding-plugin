@@ -1,17 +1,31 @@
 #!/bin/bash
 # Hook SessionStart — Jornada IA Vibe Coding.
-# Verifica as ferramentas OBRIGATORIAS de economia de tokens e injeta no contexto
-# do Claude quais estao disponiveis e como instalar as que faltam.
+# Zera o contador do bloco injetado (o proximo prompt recebe o protocolo completo),
+# instala em segundo plano o que faltar e, SO com a Jornada ativa, injeta quais
+# ferramentas de economia de tokens estao disponiveis e como instalar as ausentes.
+# As regras de uso nao vao aqui: chegam no bloco completo do proximo prompt.
 set -u
-cat >/dev/null 2>&1   # descarta o payload do hook
+payload="$(cat 2>/dev/null)"
 
 AQUI="$(cd "$(dirname "$0")" && pwd)"
 INSTALADOR="$AQUI/instalar-ferramentas.sh"
 tem() { command -v "$1" >/dev/null 2>&1; }
 
-# Instala em segundo plano o que estiver faltando (no maximo 1x por dia).
 LIB="$AQUI/jornada-lib.sh"
-if [ -f "$LIB" ]; then . "$LIB"; jornada_garantir_ferramentas 2>/dev/null || true; jornada_ativar_caveman 2>/dev/null || true; fi
+[ -f "$LIB" ] || exit 0
+. "$LIB"
+# Instala em segundo plano o que estiver faltando (no maximo 1x por dia).
+jornada_garantir_ferramentas 2>/dev/null || true
+jornada_ativar_caveman 2>/dev/null || true
+
+session=""; cwd=""
+if tem jq; then
+  session="$(printf '%s' "$payload" | jq -r '.session_id // ""' 2>/dev/null)"
+  cwd="$(printf '%s' "$payload" | jq -r '.cwd // ""' 2>/dev/null)"
+fi
+[ -n "$cwd" ] || cwd="$PWD"
+jornada_injecao_zerar "$session"
+jornada_is_active "$session" "$(jornada_root "$cwd")" || exit 0
 
 disp=""; falta=""
 add() { if tem "$1"; then disp="$disp $1"; else falta="$falta $1"; fi; }
@@ -30,25 +44,7 @@ for pl in caveman context-mode token-optimizer claude-hud; do
   fi
 done
 
-regras=""
-command -v jornada_regras_sempre_ativas >/dev/null 2>&1 || true
-type jornada_regras_sempre_ativas >/dev/null 2>&1 && regras="$(jornada_regras_sempre_ativas)"
-
-ctx="FERRAMENTAS DE ECONOMIA DE TOKENS (Jornada IA Vibe Coding) — USO OBRIGATORIO.
-Disponiveis:${disp:- nenhuma}.
-Ausentes:${falta:- nenhuma}.
-
-Regras obrigatorias enquanto trabalhar neste projeto:
-- Explorar codigo: usar mcp__tokensave__tokensave_context / _search / _callers / _callees / _impact ANTES de ler arquivos inteiros.
-- Review e impacto: usar mcp__code-review-graph__detect_changes_tool, _get_review_context_tool, _get_impact_radius_tool, _semantic_search_nodes_tool em vez de Grep amplo.
-- Busca ampla em varios arquivos: delegar a subagente, nunca despejar arquivos inteiros no contexto principal.
-- Terminal: rtk filtra a saida automaticamente; nunca contornar com 'rtk proxy'.
-- Saida grande (log, JSON, web, navegador): context-mode (ctx_execute / ctx_batch_execute) processa fora do contexto.
-- Medir: npx -y ccusage@latest daily · rtk gain · /context-mode:ctx-stats. Auditoria: skill token-optimizer.
-- Perguntas sobre a arquitetura do projeto: consultar graphify (graphify-out/) antes de ler arquivos.
-- Combinar varias ferramentas no MESMO passo (chamadas em paralelo na mesma mensagem) sempre que possivel — economiza mais que usar uma de cada vez.
-
-$regras"
+ctx="FERRAMENTAS DE ECONOMIA DE TOKENS (Jornada IA Vibe Coding) — USO OBRIGATORIO. Disponiveis:${disp:- nenhuma}. Ausentes:${falta:- nenhuma}. Regras de uso: P0 do bloco <metodologia-jornada-vibe-coding> do proximo comando e references/ferramentas-token.md."
 
 # Instrucoes de instalacao so quando algo falta (economiza token em toda sessao).
 if [ -n "$falta" ]; then

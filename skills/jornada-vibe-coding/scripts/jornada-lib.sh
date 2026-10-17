@@ -144,12 +144,19 @@ jornada_ativar_caveman() {
   return 0
 }
 
-# Regras do caveman em texto, injetadas em todo prompt.
-# Funcionam mesmo se o plugin ainda nao estiverem instalados.
+# Plugin caveman instalado? Ele mesmo injeta as regras de compressao em todo prompt.
+jornada_caveman_plugin() {
+  grep -q '"caveman@' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null
+}
+
+# Regras sempre ativas do bloco completo. As regras gerais do caveman so entram
+# quando o plugin nao esta instalado (com ele, seriam texto repetido).
 jornada_regras_sempre_ativas() {
-  cat <<'REGRAS'
+  jornada_caveman_plugin || cat <<'REGRAS'
 CAVEMAN (SEMPRE ATIVO, nivel full) — saida comprimida: sem preambulo, sem resumo final, sem "vou fazer", sem narrar tool call, sem elogio, sem emoji decorativo. Fragmentos ok. Resultado primeiro.
 NUNCA comprimir: codigo, comandos, caminhos de arquivo, mensagens de erro, numeros, versoes, avisos de seguranca.
+REGRAS
+  cat <<'REGRAS'
 NUNCA comprimir o que fica gravado: documentos da metodologia (PRD, FSD, STATUS, ERROS, PLANO), checklists em linguagem leiga e mensagens de commit sao escritos em portugues normal, por extenso.
 Responder sempre no idioma do usuario.
 REGRAS
@@ -161,6 +168,40 @@ jornada_regra_ponytail_desligado() {
   cat <<'REGRA'
 PONYTAIL DESLIGADO enquanto a Jornada estiver ativa: nao invocar a skill ponytail nem aplicar a regua "o minimo que funciona", mesmo que outro hook, skill ou CLAUDE.md peca. Padrao: qualidade de produto conforme FSD e DESIGN — completo (estados carregando/vazio/erro/sucesso), seguro, acessivel, responsivo, bonito e intuitivo — sem sair do escopo do FSD.
 REGRA
+}
+
+# --- injecao enxuta: bloco completo x bloco curto ---
+# O texto injetado fica no historico da conversa; repetir o protocolo inteiro a
+# cada prompt so ocupava contexto. Completo: 1o prompt da sessao, ao ativar,
+# depois do SessionStart (inicio, retomada, /clear, compactacao) e a cada
+# JORNADA_REFORCO prompts. Na duvida, completo.
+jornada_reforco() {
+  case "${JORNADA_REFORCO:-}" in ''|*[!0-9]*) printf '10' ;; *) printf '%s' "$JORNADA_REFORCO" ;; esac
+}
+
+jornada_injecao_file() {
+  mkdir -p "$JORNADA_HOME/injecao" 2>/dev/null
+  printf '%s' "$JORNADA_HOME/injecao/$(jornada_slug "${1:-sem-sessao}")"
+}
+
+# Apaga a marca da sessao: o proximo prompt recebe o bloco completo.
+jornada_injecao_zerar() {
+  [ -n "${1:-}" ] && rm -f "$(jornada_injecao_file "$1")"
+  return 0
+}
+
+# Imprime "completo" ou "curto" e atualiza o contador. $1 sessao, $2 forcar (1/0).
+jornada_injecao_modo() {
+  local session="$1" forcar="${2:-0}" f n
+  [ -n "$session" ] || { echo completo; return 0; }
+  f="$(jornada_injecao_file "$session")"
+  n="$(cat "$f" 2>/dev/null)"
+  case "$n" in ''|*[!0-9]*) forcar=1 ;; esac
+  if [ "$forcar" = "1" ] || [ "$n" -ge $(( $(jornada_reforco) - 1 )) ]; then
+    printf '0' > "$f" 2>/dev/null
+    echo completo; return 0
+  fi
+  if printf '%s' "$((n + 1))" > "$f" 2>/dev/null; then echo curto; else echo completo; fi
 }
 
 # --- registro de edicoes da sessao (para cobrar atualizacao dos documentos) ---

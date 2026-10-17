@@ -184,7 +184,7 @@ Cada skill e plugin instalado custa token em **toda** mensagem (nome e descriç�
 
 ## caveman fica sempre ligado
 
-Os hooks do plugin injetam a regra dele em todo prompt, mesmo antes de o plugin estar instalado, e gravam `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir. Instalar o plugin melhora (ele traz as sub-skills), mas não é o que garante a ativação.
+Sem o plugin instalado, o bloco completo da Jornada traz as regras de compressão; com o plugin, ele mesmo as injeta e a Jornada não repete o texto (só acrescenta a regra própria: documentos, checklists e commits em português normal). O hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir. Instalar o plugin melhora (ele traz as sub-skills), mas não é o que garante a ativação.
 
 ## Combine ferramentas no mesmo passo
 

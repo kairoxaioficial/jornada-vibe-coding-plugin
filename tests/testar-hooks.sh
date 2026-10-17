@@ -70,6 +70,38 @@ if contem "$saida" "jornada-executor" && contem "$saida" "ORDEM DE SERVICO"; the
 if [ -f "$S/../references/roteamento-modelos.md" ] && grep -q "roteamento-modelos.md" "$S/../SKILL.md"; then ok "guia de roteamento existe e o SKILL.md aponta"; else falha "guia de roteamento existe e o SKILL.md aponta"; fi
 if grep -q 'agents/\*.md' "$RAIZ/instalar.sh"; then ok "instalar.sh copia os agentes"; else falha "instalar.sh copia os agentes"; fi
 
+# 6. SessionStart e prompt calados com a Jornada desligada
+rm -f "$JORNADA_HOME/global-on"
+if [ -z "$(inicio s0 startup)" ]; then ok "SessionStart calado com a Jornada desligada"; else falha "SessionStart calado com a Jornada desligada"; fi
+if [ -z "$(prompt s0 "oi")" ]; then ok "prompt sem bloco com a Jornada desligada"; else falha "prompt sem bloco com a Jornada desligada"; fi
+: > "$JORNADA_HOME/global-on"
+ss="$(inicio s0 startup)"
+if contem "$ss" "Disponiveis" && ! contem "$ss" "Regras obrigatorias"; then ok "SessionStart ativo so lista as ferramentas"; else falha "SessionStart ativo so lista as ferramentas"; fi
+
+# 7. injecao enxuta: completo, curto, completo a cada JORNADA_REFORCO e depois do SessionStart
+export JORNADA_REFORCO=3
+seq=""
+for i in 1 2 3 4 5; do
+  b="$(prompt s2 "pedido $i")"
+  if contem "$b" 'bloco="completo"'; then seq="${seq}C"; elif contem "$b" 'bloco="curto"'; then seq="${seq}c"; else seq="${seq}?"; fi
+  [ "$i" = "2" ] && curto="$b"
+done
+if [ "$seq" = "CccCc" ]; then ok "ciclo completo/curto a cada 3 ($seq)"; else falha "ciclo completo/curto a cada 3 (esperado CccCc, veio $seq)"; fi
+inicio s2 compact >/dev/null
+if contem "$(prompt s2 "depois de compactar")" 'bloco="completo"'; then ok "completo depois de compactar"; else falha "completo depois de compactar"; fi
+if ! contem "$curto" "P0 FERRAMENTAS" && [ "${#curto}" -lt 1500 ]; then ok "bloco curto sem o protocolo inteiro (${#curto} bytes)"; else falha "bloco curto sem o protocolo inteiro (${#curto} bytes)"; fi
+if contem "$curto" "jornada-executor" && contem "$curto" "UMA etapa por comando"; then ok "bloco curto traz as regras essenciais"; else falha "bloco curto traz as regras essenciais"; fi
+prompt s3 "um" >/dev/null; prompt s3 "dois" >/dev/null
+if contem "$(prompt s3 "/jornada-vibe-coding")" 'bloco="completo"'; then ok "ativar forca o bloco completo"; else falha "ativar forca o bloco completo"; fi
+unset JORNADA_REFORCO
+
+# 8. caveman: regras gerais so sem o plugin instalado
+sem="$(prompt s4 "x")"
+printf '{"plugins":{"caveman@caveman":[]}}' > "$HOME/.claude/plugins/installed_plugins.json"
+com="$(prompt s5 "x")"
+if contem "$sem" "CAVEMAN (SEMPRE ATIVO" && ! contem "$com" "CAVEMAN (SEMPRE ATIVO" && contem "$com" "NUNCA comprimir o que fica gravado"; then
+  ok "regras do caveman so sem o plugin"; else falha "regras do caveman so sem o plugin"; fi
+
 echo
 echo "$total testes, $falhas falhas"
 [ "$falhas" -eq 0 ]

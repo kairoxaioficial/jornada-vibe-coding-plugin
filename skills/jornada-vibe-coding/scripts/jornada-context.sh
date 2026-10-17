@@ -52,8 +52,24 @@ fi
 
 jornada_ativar_caveman
 
+# Bloco curto: o protocolo completo ja esta no historico desta conversa.
+if [ "$(jornada_injecao_modo "$session" "$activated")" = "curto" ]; then
+  avisos=""
+  [ -n "$agents_warn" ] && avisos="$agents_warn
+"
+  [ -n "$missing_core" ] && avisos="${avisos}REGRA DURA: nenhum codigo antes dos documentos; faltam: $missing_core (usar a skill estruturar-projeto).
+"
+  cat <<EOF
+<metodologia-jornada-vibe-coding estado="ATIVA" bloco="curto">
+Projeto: $root | Documentos: $docs_state
+${avisos}Protocolo P0-P8 completo: no ultimo bloco completo desta conversa (volta a cada $(jornada_reforco) comandos e depois de compactar/limpar); nada foi relaxado. Essencial: grafo antes de ler codigo; documentos antes do codigo; matriz de impacto; PLANO e STATUS antes de editar; UMA etapa por comando; Opus planeja e escreve a ordem de servico, jornada-executor (Sonnet) implementa, Opus revisa e roda os testes de novo; testar de verdade; STATUS e ERROS sempre; commit + checklists 1-2-3 em linguagem leiga; ponytail desligado; documentos, checklists e commits em portugues normal.
+</metodologia-jornada-vibe-coding>
+EOF
+  exit 0
+fi
+
 cat <<EOF
-<metodologia-jornada-vibe-coding estado="ATIVA">
+<metodologia-jornada-vibe-coding estado="ATIVA" bloco="completo">
 Projeto: $root
 Documentos da metodologia: $docs_state
 $agents_warn
@@ -75,6 +91,7 @@ Concluiu todas as etapas do PLANO -> Revisao de Seguranca (Passo 5) -> Documenta
 $(jornada_regras_sempre_ativas)
 
 Prompt verbatim de cada fase: o SKILL.md da metodologia Jornada IA Vibe Coding e references/. Desativar: "/jornada-vibe-coding off".
+Este bloco completo volta a cada $(jornada_reforco) comandos e depois de compactar/limpar; nos demais chega um lembrete curto — as regras daqui continuam valendo.
 </metodologia-jornada-vibe-coding>
 EOF
 exit 0

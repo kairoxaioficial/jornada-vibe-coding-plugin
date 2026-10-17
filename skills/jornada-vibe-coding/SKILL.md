@@ -43,7 +43,7 @@ A metodologia **não é** "um turno". Depois de ativada, ela vale para **TODOS o
 
 **O que a ativação faz (garantia por hook, não por memória do modelo):**
 1. Marca a sessão (`~/.claude/jornada/sessions/<session_id>`) e o projeto (`~/.claude/jornada/projects/<slug>`).
-2. Hook `UserPromptSubmit` (`scripts/jornada-context.sh`) injeta o **protocolo P1–P8** em **todo prompt seguinte**, com o estado real dos documentos daquele projeto.
+2. Hook `UserPromptSubmit` (`scripts/jornada-context.sh`) injeta o **protocolo P0–P8** com o estado real dos documentos daquele projeto: o **bloco completo** na 1ª mensagem da sessão, ao ativar, depois de compactar/limpar e a cada 10 comandos (`JORNADA_REFORCO`); nos demais, um **bloco curto** com o estado e as regras essenciais. O texto injetado fica no histórico — repetir o protocolo inteiro em toda mensagem só ocupava contexto.
 3. Hook `PreToolUse` em `Edit|Write|MultiEdit|NotebookEdit` (`scripts/jornada-guard.sh`) **bloqueia edição de código** enquanto faltar `PRD.md`, `docs/FSD.md`, `docs/PLANO.md`, `docs/STATUS.md`, `docs/ERROS.md` — e **bloqueia sempre a criação de `AGENTS.md`**.
    - Documentos, `docs/`, `.github/`, `.claude/`, README, `.gitignore`, `.gitattributes` passam sempre (é o que precisa vir antes).
    - Isentos de bloqueio: `$HOME` puro, `~/.claude`, `~/.config`, `/tmp`, `/private/tmp`.
@@ -670,7 +670,7 @@ Ou seja: em toda sessão, em todo projeto, o mapeamento por grafo vem antes da l
 
 ### caveman: sempre ligado
 
-Não são opcionais nem "quando der". Os hooks do plugin injetam a regra em **todo prompt**, mesmo que o plugin ainda não esteja instalado — e o hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir.
+Não é opcional nem "quando der". Com o plugin caveman instalado, ele mesmo injeta as regras em todo prompt e o bloco da Jornada só acrescenta a regra própria da metodologia (documentos, checklists e commits em português normal); sem o plugin, o bloco completo da Jornada traz as regras de compressão. O hook `SessionStart` grava `~/.claude/.caveman-active` com o nível `full` se o arquivo não existir.
 
 **caveman** — resposta comprimida: sem preâmbulo, sem resumo final, sem narrar tool call. **Nunca** comprimir código, comandos, caminhos, erros, números, versões e avisos de segurança. **Nunca** comprimir o que fica gravado: PRD, FSD, STATUS, ERROS, PLANO, checklists em linguagem leiga e mensagens de commit saem em português normal, por extenso.
 

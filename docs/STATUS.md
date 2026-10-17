@@ -10,7 +10,7 @@
 | 1 | Documentos do repositório | concluída | 16/10/2026 | ver git log |
 | 2 | Tirar o ponytail | concluída | 16/10/2026 | ver git log |
 | 3 | Opus planeja, Sonnet executa | concluída | 16/10/2026 | ver git log |
-| 4 | Menos texto repetido a cada mensagem | pendente | — | — |
+| 4 | Menos texto repetido a cada mensagem | concluída | 16/10/2026 | ver git log |
 | 5 | SKILL.md mais leve | pendente | — | — |
 | 6 | Instalar, publicar e conferir | pendente | — | — |
 
@@ -33,6 +33,13 @@
 - Testes: `bash tests/testar-hooks.sh` → 27 testes, 0 falhas.
 - Erros: ERRO-002 e ERRO-003 (corrigidos).
 - Próxima etapa: 4 — menos texto repetido a cada mensagem.
+
+### Etapa 4 — Menos texto repetido a cada mensagem (16/10/2026)
+- Arquivos: `scripts/jornada-lib.sh` (detecção do plugin caveman, contador de injeção por sessão, `JORNADA_REFORCO`), `scripts/jornada-context.sh` (bloco completo × bloco curto), `scripts/verificar-ferramentas.sh` (lê o payload, zera o contador em todo SessionStart, só fala com a Jornada ativa, sem repetir as regras do P0), `SKILL.md` e `references/ferramentas-token.md` (descrição do novo comportamento), `tests/testar-hooks.sh` (9 testes novos).
+- Testes: `bash tests/testar-hooks.sh` → 36 testes, 0 falhas (ciclo completo/curto a cada 3 com `JORNADA_REFORCO=3`, completo depois de compactar e ao ativar, SessionStart calado com a Jornada desligada, regras do caveman só sem o plugin).
+- Medição (projeto de teste com documentos completos e plugin caveman instalado): bloco antigo 6.212 bytes em toda mensagem; novo bloco completo 7.288 bytes (1ª mensagem e a cada 10) e bloco curto 755 bytes nas demais — em 10 mensagens, de ~62 KB para ~14 KB de texto injetado (~77% menos). SessionStart: de ~2,5 KB para uma linha (~300 bytes) quando nada falta.
+- Erros: nenhum.
+- Próxima etapa: 5 — SKILL.md mais leve.
 
 ## Checklist completo — todas as etapas
 
