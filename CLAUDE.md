@@ -36,3 +36,13 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes_tool` for code review.
 3. Use `get_affected_flows_tool` to understand impact.
 4. Use `query_graph_tool` pattern="tests_for" to check coverage.
+
+## Como trabalhar neste repositório
+
+Este repositório é a fonte da verdade do plugin Jornada IA Vibe Coding. A cópia que roda na máquina (`~/.claude/skills/jornada-vibe-coding`, `~/.claude/skills/estruturar-projeto`, `~/.claude/agents/jornada-executor.md`) é instalada a partir daqui — não edite a cópia instalada direto.
+
+- Documentos da metodologia: `PRD.md`, `DECISOES_TECNICAS.md`, `INSUMOS.md`, `docs/FSD.md`, `docs/DESIGN.md`, `docs/PLANO.md`, `docs/STATUS.md`, `docs/ERROS.md`.
+- Testar os hooks: `bash tests/testar-hooks.sh` (usa um HOME temporário; não mexe no estado real).
+- Instalar na máquina depois de mudar: `bash instalar.sh` (faz backup do `~/.claude/settings.json`, recopia skills e agente, registra hooks que faltarem).
+- Versão: `.claude-plugin/plugin.json` (semver). Um commit por etapa; push para `origin main`.
+- Os scripts de hook ficam sem acentos; os documentos `.md`, em português normal.
