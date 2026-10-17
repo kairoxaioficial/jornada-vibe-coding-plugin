@@ -81,12 +81,12 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - [x] Testes automatizados dos hooks (`tests/testar-hooks.sh`).
 
 **Versão 1.2.1 (17/10/2026)**
-- [ ] Lista de ângulos obrigatória antes de cada ordem de serviço: concorrência e travas; permissão com campo vazio ou anônimo; entrada estranha; cancelar, repetir, desfazer e reprovar depois de aprovar; dado real da produção; estados de erro, vazio e carregando; frases de tela que prometem algo; teste que reprova sem a mudança; integração com outras frentes; 360 px, teclado e leitor de tela.
-- [ ] Executor com esforço próprio: `high` por padrão; `xhigh` nas etapas difíceis (migration e dado de produção, concorrência e travas, integração externa, partes de permissão ou pagamento fora do núcleo sensível); `max` nas mais complexas (duas ou mais dessas dificuldades juntas, máquina de estados com cinco ou mais estados) e na nova tentativa de uma etapa `xhigh` que falhou.
-- [ ] Ultracode só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado: planejamento por ângulos (Opus) e auditoria adversarial antes de publicar (revisores no Opus, verificadores no Sonnet). Quem implementa é sempre o `jornada-executor`.
-- [ ] Aviso de esforço: o bloco injetado mostra o esforço e o Ultracode da sessão; quando não combinam com a fase do trabalho, o modelo pede ao usuário, uma vez, para ajustar.
-- [ ] Executor novo por etapa; consertos da auditoria vão para um executor novo; trabalho em paralelo só com arquivos separados, números reservados, banco de ensaio próprio e um dono para documentos e ferramentas compartilhadas.
-- [ ] Teste novo só vale se reprovar sem a mudança.
+- [x] Lista de ângulos obrigatória antes de cada ordem de serviço: concorrência e travas; permissão com campo vazio ou anônimo; entrada estranha; cancelar, repetir, desfazer e reprovar depois de aprovar; dado real da produção; estados de erro, vazio e carregando; frases de tela que prometem algo; teste que reprova sem a mudança; integração com outras frentes; 360 px, teclado e leitor de tela.
+- [x] Executor com esforço próprio: `high` por padrão; `xhigh` nas etapas difíceis (migration e dado de produção, concorrência e travas, integração externa, partes de permissão ou pagamento fora do núcleo sensível); `max` nas mais complexas (duas ou mais dessas dificuldades juntas, máquina de estados com cinco ou mais estados) e na nova tentativa de uma etapa `xhigh` que falhou.
+- [x] Ultracode só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado: planejamento por ângulos (Opus) e auditoria adversarial antes de publicar (revisores no Opus, verificadores no Sonnet). Quem implementa é sempre o `jornada-executor`.
+- [x] Aviso de esforço: o bloco injetado mostra o esforço e o Ultracode da sessão; quando não combinam com a fase do trabalho, o modelo pede ao usuário, uma vez, para ajustar.
+- [x] Executor novo por etapa; consertos da auditoria vão para um executor novo; trabalho em paralelo só com arquivos separados, números reservados, banco de ensaio próprio e um dono para documentos e ferramentas compartilhadas.
+- [x] Teste novo só vale se reprovar sem a mudança.
 
 ## 6. Funcionalidades que ficam fora da primeira versão
 

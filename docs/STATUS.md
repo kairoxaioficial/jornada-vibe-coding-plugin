@@ -18,7 +18,7 @@
 | 8 | Regras novas da metodologia | concluída | 17/10/2026 | ver git log |
 | 9 | Aviso de esforço no hook | concluída | 17/10/2026 | ver git log |
 | 9b | Esforço máximo nas etapas mais complexas | concluída | 17/10/2026 | ver git log |
-| 10 | Instalar, publicar e conferir (1.2.1) | em andamento | 17/10/2026 | — |
+| 10 | Instalar, publicar e conferir (1.2.1) | concluída | 17/10/2026 | ver git log |
 
 ## Detalhamento das etapas
 
@@ -89,6 +89,23 @@
 - Erros: nenhum.
 - Próxima etapa: 10 — instalar, publicar e conferir.
 
+### Etapa 10 — Instalar, publicar e conferir (1.2.1) (17/10/2026)
+- Arquivos: `.claude-plugin/plugin.json` (1.2.1), `README.md` (novidades da 1.2.1), `METODOLOGIA.md` (P4, P5, P6 e o parágrafo de esforço e Ultracode), `PRD.md` (itens da 1.2.1 marcados como feitos), `docs/PLANO.md`, `docs/STATUS.md`.
+- Instalação: `bash instalar.sh` → saída 0; `~/.claude/skills/jornada-vibe-coding`, `~/.claude/skills/estruturar-projeto` e `~/.claude/agents/jornada-executor.md` idênticos ao repositório (`diff -rq` sem diferença); 7 hooks da Jornada no `settings.json`, sem duplicados. A primeira tentativa de instalação foi interrompida pelo reinício da sessão do usuário; a cópia já tinha terminado e a instalação foi repetida sem problema.
+- Testes: `bash tests/testar-hooks.sh` → 62 testes, 0 falhas. Hook instalado, na própria sessão: o bloco chegou com `Esforco da sessao: max (/effort) | Ultracode: nao detectado`, que confere com o `/effort` que o usuário tinha acabado de rodar (a resposta dele não mudou o Ultracode). Teste real `claude -p --model sonnet` numa pasta temporária pedindo ao `jornada-executor` (agora com `effort: high`) uma etapa de um arquivo: sucesso, `ok.txt` criado com `ok`, relatório no formato do agente; custo US$ 0,32.
+- Erros: nenhum.
+
+### Revisão de segurança da 1.2.1 (Passo 5) — 17/10/2026
+- Detector de esforço: o histórico só é lido com `grep` e `awk`, nunca executado; o nível impresso é filtrado para letras minúsculas (até 12); o modelo vai ao `jq` como argumento (`--arg`); a marca da sessão fica dentro de `$JORNADA_HOME` (`/` vira `-`; `.` e `..` viram `sessao-.` e `sessao-..`); a limpeza (`find -mtime +7 -delete`) só alcança `$JORNADA_HOME/esforco`.
+- Ligar e desligar: só por texto do usuário — notificação de tarefa e caminhos com `jornada-vibe-coding` não contam (ERRO-006). Isso fecha o caminho em que um relatório de agente desligaria as travas da sessão.
+- Workflows: só com o ok do usuário, ou com a palavra ultracode no pedido dele; nenhum workflow abre dezenas de agentes sem aviso.
+- Executor: o esforço passado na chamada não muda o que ele pode fazer; continua sem commit, sem push e sem editar os documentos de planejamento.
+- Desempenho: o detector acrescenta cerca de 0,2 s por mensagem num histórico de 20 MB.
+- Resultado: nada a corrigir.
+
+### Documentação final da 1.2.1 (Passo 6) — 17/10/2026
+- `README.md`, `METODOLOGIA.md`, `PRD.md`, `DECISOES_TECNICAS.md`, `docs/FSD.md`, `SKILL.md` e `references/roteamento-modelos.md` descrevem a versão 1.2.1. `INSTALAR.md` e `CLAUDE.md` foram conferidos e não precisaram mudar: a instalação e os testes continuam com os mesmos comandos.
+
 ### Revisão de segurança dos scripts (Passo 5) — 16/10/2026
 - Texto do prompt só é comparado em `case`, nunca executado nem interpolado em comando.
 - Arquivos de estado novos (`injecao/`) ficam dentro de `$JORNADA_HOME`; o nome vem do `session_id` com `/` trocado por `-`, então não sai da pasta.
@@ -108,6 +125,11 @@
 4. Menos texto repetido: mandar duas mensagens seguidas → a primeira recebe o bloco completo e a segunda o bloco curto.
 5. SKILL.md mais leve: abrir `skills/jornada-vibe-coding/SKILL.md` → seções de deploy, documentação final e extras apontam para `references/detalhes-skill.md`, onde o texto completo está.
 6. Instalado e publicado: `bash tests/testar-hooks.sh` → "0 falhas"; versão 1.2.0 no GitHub.
+7. Lista de ângulos (1.2.1): pedir uma etapa de código → a ordem de serviço traz o item "Ângulos", com cada ângulo como requisito ou "não se aplica".
+8. Esforço do executor (1.2.1): etapa comum → executor em `high`; etapa com migration ou concorrência → chamada com `xhigh`; etapa que junta duas dificuldades, ou nova tentativa de uma etapa `xhigh` que falhou → `max`.
+9. Aviso de esforço (1.2.1): mandar qualquer mensagem → o bloco mostra "Esforco da sessao: … | Ultracode: …"; com `max` numa etapa comum, a IA pede uma vez para trocar e não insiste.
+10. Ultracode com pergunta (1.2.1): pedir uma frente grande → a IA pergunta antes de abrir vários agentes e diz quantos; sem o ok, nada de workflow.
+11. Só o texto do usuário liga e desliga (1.2.1): notificações de tarefa e caminhos com "jornada-vibe-coding" não mudam o estado; `/jornada-vibe-coding off` digitado desliga.
 
 ## Próximos passos
 

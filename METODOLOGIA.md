@@ -73,15 +73,17 @@ O protocolo inteiro chega para a IA na primeira mensagem, ao ligar a metodologia
 
 **P3 — Classificar o pedido.** É um ajuste simples (vai direto para o código) ou um recurso novo / mudança grande (exige atualizar PRD, FSD, decisões técnicas antes)?
 
-**P4 — Planejar.** A tarefa entra em `docs/PLANO.md` dividida em etapas, e a etapa atual é aberta em `docs/STATUS.md`.
+**P4 — Planejar.** A tarefa entra em `docs/PLANO.md` dividida em etapas, e a etapa atual é aberta em `docs/STATUS.md`. Antes de escrever a ordem de serviço, a IA passa por uma lista de dez ângulos — o que acontece se duas pessoas fizerem ao mesmo tempo, se o responsável estiver vazio, se alguém digitar algo estranho, se cancelar ou repetir, com os dados reais da produção, nos estados de erro, nas frases da tela, no celular de 360 px — e cada um vira requisito ou fica marcado como "não se aplica". Em frente grande ou arriscada, ela pergunta se você quer esse planejamento feito por vários agentes (Ultracode), dizendo quantos.
 
-**P5 — Executar UMA etapa.** Uma por comando. Nada de construir cinco coisas de uma vez, nada de usar tecnologia que não está no FSD. Quem escreve o código é um ajudante no modelo Sonnet (`jornada-executor`), a partir de uma *ordem de serviço* detalhada que o Opus escreveu; mudanças pequenas e código sensível de segurança o próprio Opus faz.
+**P5 — Executar UMA etapa.** Uma por comando. Nada de construir cinco coisas de uma vez, nada de usar tecnologia que não está no FSD. Quem escreve o código é um ajudante no modelo Sonnet (`jornada-executor`), a partir de uma *ordem de serviço* detalhada que o Opus escreveu; mudanças pequenas e código sensível de segurança o próprio Opus faz. O ajudante trabalha com esforço `high`, sobe para `xhigh` nas etapas difíceis e para `max` nas mais complexas (ou quando uma tentativa em `xhigh` falha), e cada etapa ganha um ajudante novo.
 
-**P6 — Testar de verdade.** Lint, tipos, testes, build, migrations, subir o servidor. Se tem tela, screenshot e conferência no celular. O Opus revisa o que o ajudante fez e roda os testes de novo antes do commit. *Sistema criado não é sistema testado.*
+**P6 — Testar de verdade.** Lint, tipos, testes, build, migrations, subir o servidor. Se tem tela, screenshot e conferência no celular. O Opus revisa o que o ajudante fez e roda os testes de novo antes do commit. Todo teste novo é conferido desfazendo a mudança: se ele não reprovar, não vale. Antes de publicar uma frente grande, a IA pergunta se você quer uma auditoria com vários agentes tentando achar defeitos. *Sistema criado não é sistema testado.*
 
 **P7 — Registrar.** `STATUS.md` recebe a etapa, os arquivos alterados, os testes e o resultado. `ERROS.md` recebe todo erro que apareceu, mesmo os já corrigidos — e é consultado **antes** de tentar corrigir um erro novo.
 
 **P8 — Entregar.** Commit + três checklists: o que foi feito (linguagem leiga), o que testar e como (ação → resultado esperado), e o que conferir para ter certeza de que nada quebrou.
+
+**Esforço e Ultracode.** O bloco da metodologia mostra, a cada mensagem, o esforço da conversa e se o Ultracode está ligado. Para o dia a dia, o ideal é `/effort high` com o Ultracode desligado (`/effort ultracode off`); se não estiver assim, a IA avisa uma vez. O Ultracode — vários agentes trabalhando em paralelo — fica para frente grande ou arriscada, sempre perguntando antes. Para usá-lo numa tarefa específica, basta escrever a palavra `ultracode` no pedido.
 
 ---
 

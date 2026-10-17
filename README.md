@@ -15,6 +15,14 @@ Ao ativar, o Claude passa a trabalhar sempre da mesma forma: primeiro entende e 
 - **Hooks** — mantêm a metodologia ativa durante toda a sessão, impedem que o Claude comece a mexer no código antes de os documentos existirem e conferem, a cada sessão, se as ferramentas de economia de tokens estão instaladas.
 - **`scripts/instalar-ferramentas.sh`** — instala as nove ferramentas obrigatórias de economia de tokens.
 
+## Novidades da versão 1.2.1
+
+- **Planejar por todos os ângulos.** Antes de cada ordem de serviço, o Opus passa por uma lista fixa de dez ângulos: concorrência, permissão com campo vazio, entrada estranha, cancelar e repetir, dado real da produção, estados de erro, frases de tela que prometem algo, teste que reprova sem a mudança, integração com outras frentes, 360 px e acessibilidade. Numa análise de 62 defeitos reais, essa lista teria evitado cerca de 4 em cada 10, incluindo os mais graves.
+- **Esforço certo em cada papel.** O executor roda em `high`, sobe para `xhigh` nas etapas difíceis (migration, concorrência, integração externa, partes de permissão e pagamento) e para `max` nas mais complexas — quando essas dificuldades se juntam ou quando uma tentativa em `xhigh` falha. A conversa principal fica em `high`. O bloco da metodologia mostra o esforço e o Ultracode da sessão, e o Claude pede para você ajustar quando não combinam com o trabalho — o `/effort` é comando seu.
+- **Ultracode só onde vale.** Em frente grande ou arriscada, o Claude pergunta antes, mostrando quantos agentes vai abrir: planejamento por ângulos com agentes no Opus e auditoria adversarial antes de publicar (revisores no Opus, verificadores no Sonnet). Quem implementa é sempre o executor Sonnet. Ligado o tempo todo, o Ultracode chegou a consumir 43% de um limite semanal numa noite.
+- **Executor novo por etapa** e **trabalho em paralelo só quando é seguro** (arquivos separados, números reservados, banco de ensaio próprio).
+- **Teste que reprova sem a mudança:** todo teste novo é conferido desfazendo a mudança.
+
 ## Novidades da versão 1.2.0
 
 - **O Opus planeja, o Sonnet executa.** A sessão principal (Opus) lê o código pelo grafo, escreve os documentos, planeja a etapa e escreve uma *ordem de serviço* detalhada (arquivos, contratos, regras, interface, segurança, testes, critério de pronto). O subagente `jornada-executor` (Sonnet) implementa e testa; o Opus revisa o diff, roda os testes de novo e confere a tela antes do commit. Mudança pequena, código sensível de segurança e documentos ficam com o Opus. Escrever código é o que mais consome tokens; no Sonnet ele custa metade por token (Opus 5.5: US$ 4/20 por milhão de tokens de entrada/saída; Sonnet 5.5: US$ 2/10) e roda num contexto pequeno, e a sessão do Opus fica enxuta. Detalhes: [`references/roteamento-modelos.md`](skills/jornada-vibe-coding/references/roteamento-modelos.md).
