@@ -2,6 +2,7 @@
 
 > Projeto: plugin Jornada IA Vibe Coding (`jornada-vibe-coding-plugin`)
 > Atualizado a cada avanço. O hook Stop bloqueia o encerramento se houve código alterado sem este arquivo atualizado.
+> Tarefa atual: versão 1.2.1 — esforço, Ultracode e planejamento por ângulos (`docs/PLANO.md`, Tarefa 2).
 
 ## Visão geral do progresso
 
@@ -13,6 +14,10 @@
 | 4 | Menos texto repetido a cada mensagem | concluída | 16/10/2026 | ver git log |
 | 5 | SKILL.md mais leve | concluída | 16/10/2026 | ver git log |
 | 6 | Instalar, publicar e conferir | concluída | 16/10/2026 | ver git log |
+| 7 | Documentos da 1.2.1 | concluída | 17/10/2026 | ver git log |
+| 8 | Regras novas da metodologia | em andamento | 17/10/2026 | — |
+| 9 | Aviso de esforço no hook | pendente | — | — |
+| 10 | Instalar, publicar e conferir (1.2.1) | pendente | — | — |
 
 ## Detalhamento das etapas
 
@@ -54,6 +59,14 @@
 - Instalação: `bash instalar.sh` na máquina do usuário → `~/.claude/skills/jornada-vibe-coding`, `~/.claude/skills/estruturar-projeto` e `~/.claude/agents/jornada-executor.md` idênticos ao repositório (`diff -rq` sem diferença); backup do `settings.json` criado; nenhum hook duplicado (7 hooks da Jornada).
 - Testes: `bash tests/testar-hooks.sh` → 39 testes, 0 falhas. Hooks instalados com sessão descartável: 1ª mensagem bloco completo (7.267 bytes), 2ª bloco curto (734 bytes), SessionStart de compactação com uma linha, mensagem seguinte completo de novo. Teste real `claude -p --model opus` pedindo ao `jornada-executor` uma etapa de um arquivo: `modelUsage` com `claude-opus-5-5` e `claude-sonnet-5-5`, arquivo criado, relatório no formato do agente (custo do teste: US$ 0,61).
 - Erros: ERRO-004 (corrigido).
+
+### Etapa 7 — Documentos da 1.2.1 (17/10/2026)
+- Tarefa aberta: versão 1.2.1 (ver `docs/PLANO.md`, Tarefa 2), pedida depois da análise da noite do ARCA.
+- Arquivos: `PRD.md` (funcionalidades, regras, informações controladas e critérios da 1.2.1), `DECISOES_TECNICAS.md` (decisões 17 a 23), `docs/FSD.md` (hooks, estado `esforco/`, linha de esforço, itens 6 a 10 do roteamento, seção 9a do detector de esforço, testes e critérios da 1.2.1), `docs/PLANO.md` (Tarefa 2, etapas 7 a 10).
+- Evidência usada: análise das transcrições do ARCA (62 defeitos distintos por causa raiz, incidentes da execução em paralelo, contexto dos agentes) e documentação oficial do Claude Code sobre workflows, esforço e subagentes; formato da mensagem do `/effort` conferido no código do Claude Code instalado.
+- Testes: `bash tests/testar-hooks.sh` → 39 testes, 0 falhas (nenhum código mudou nesta etapa).
+- Erros: nenhum.
+- Próxima etapa: 8 — regras novas da metodologia.
 
 ### Revisão de segurança dos scripts (Passo 5) — 16/10/2026
 - Texto do prompt só é comparado em `case`, nunca executado nem interpolado em comando.

@@ -1,14 +1,14 @@
 # DECISOES_TECNICAS — Decisões técnicas do plugin
 
 > Projeto: plugin Jornada IA Vibe Coding (`jornada-vibe-coding-plugin`)
-> Última atualização: 16/10/2026 (versão 1.2.0)
+> Última atualização: 17/10/2026 (versão 1.2.1)
 
 | # | Decisão | Escolha | Justificativa / origem |
 |---|---|---|---|
 | 1 | Plataforma | Claude Code: skills, hooks e subagentes | O sistema é a metodologia rodando dentro do Claude Code (`hooks/hooks.json`, `skills/`) |
 | 2 | Distribuição | Plugin (`.claude-plugin/`) e instalação direta (`instalar.sh` copia as skills para `~/.claude/skills` e registra os hooks no `~/.claude/settings.json`) | A máquina do usuário usa a instalação direta; o plugin serve para outras pessoas |
 | 3 | Linguagem dos hooks | `bash` + `jq` | Sem Node nem Python; roda em macOS e Linux (`scripts/*.sh`) |
-| 4 | Estado | Arquivos-marca em `~/.claude/jornada/` (`global-on`, `sessions/`, `projects/`, `p1/`, `edits/` e, a partir da 1.2.0, `injecao/`) | Simples, sem banco, fácil de inspecionar e apagar (`jornada-lib.sh`) |
+| 4 | Estado | Arquivos-marca em `~/.claude/jornada/` (`global-on`, `sessions/`, `projects/`, `p1/`, `edits/`, a partir da 1.2.0 `injecao/` e, a partir da 1.2.1, `esforco/`) | Simples, sem banco, fácil de inspecionar e apagar (`jornada-lib.sh`) |
 | 5 | Ativação | Só por comando explícito; três alcances: sessão, projeto e global | Decisão do PRD (seção 6): nada liga sozinho |
 | 6 | Travas | PreToolUse (edição sem documentos, AGENTS.md, leitura antes do grafo), Stop (STATUS desatualizado) | Regra garantida por hook, não pela memória do modelo |
 | 7 | Ferramentas de economia de tokens | tokensave, rtk, code-review-graph, graphify, tokenoptim, caveman, context-mode, token-optimizer, claude-hud, ccusage | Cada uma cobre um tipo de gasto (`references/ferramentas-token.md`) |
@@ -24,6 +24,14 @@
 | 14 | Testes | `tests/testar-hooks.sh` (bash), com `HOME` isolado numa pasta temporária dentro do repositório | Testa os hooks como o Claude Code os chama (JSON na entrada padrão), sem tocar no estado real |
 | 15 | Versionamento e publicação | Semver em `.claude-plugin/plugin.json`; GitHub público `kairoxaioficial/jornada-vibe-coding-plugin`, branch `main` | Histórico por etapa (um commit por etapa) |
 | 16 | Segurança dos hooks | O texto do prompt só é comparado em `case`, nunca executado; nomes de arquivo de estado vêm do `session_id` com `/` trocado por `-` | Evita execução de conteúdo e caminhos fora de `~/.claude/jornada` |
+| 17 | Lista de ângulos (1.2.1) | Obrigatória antes de cada ordem de serviço: dez ângulos, cada um vira requisito ou "não se aplica" | Na noite de 16 para 17/10 no projeto ARCA, 22 dos 62 defeitos confirmados pela revisão eram casos que o plano não previu; a análise estimou que planejar por ângulos evitaria cerca de 24 (39%), incluindo o único defeito grave e os dois deadlocks |
+| 18 | Esforço do executor (1.2.1) | `effort: high` no agente; `xhigh` passado na chamada nas etapas difíceis | Escolha do usuário em 17/10/2026. A documentação do Claude Code indica `high` quando a verificação importa e diz que `max` tem retorno decrescente e tende a pensar demais |
+| 18a | Alternativa descartada: `xhigh` sempre | — | Gasta mais em toda etapa sem ganho medido na implementação |
+| 19 | Ultracode (1.2.1) | Só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado; dois usos: planejamento por ângulos e auditoria adversarial antes de publicar | Escolha do usuário em 17/10/2026. No ARCA, o Ultracode ligado na sessão inteira abriu 203 agentes no Opus numa noite (cerca de 43% do limite semanal); a documentação recomenda workflows para tarefas grandes, não para rotina. As auditorias acharam 54 defeitos novos, então o uso certo é o pontual |
+| 20 | Modelos dentro dos workflows (1.2.1) | Ângulos e revisores no Opus (`high`); buscas e verificadores no Sonnet (`medium`); implementação pelo `jornada-executor` | O Ultracode não escolhe modelo: os agentes herdam o da sessão. Os verificadores foram de 55% a 67% dos agentes das auditorias do ARCA |
+| 21 | Aviso de esforço (1.2.1) | O hook lê o `/effort` da sessão (histórico desde o último início ou retomada do processo), a variável `CLAUDE_CODE_EFFORT_LEVEL` e as configurações, e mostra no bloco; o modelo pede ao usuário, uma vez, para ajustar | O modelo não consegue mudar o esforço da conversa; o usuário consegue. Limite: depois de `/clear` o histórico é novo e o aviso volta às configurações até o próximo `/effort` |
+| 22 | Ciclo do executor e paralelismo (1.2.1) | Executor novo por etapa; consertos da auditoria num executor novo; paralelo só com arquivos separados, números reservados, banco de ensaio próprio e um dono para documentos e ferramentas compartilhadas | No ARCA, agentes vivos a noite toda chegaram a 965 mil tokens de contexto (cerca de 1 bilhão de tokens relidos), e a execução em paralelo trouxe os dois incidentes de produção (numeração esgotada e escrita acidental pela ferramenta de ensaio) |
+| 23 | Teste que reprova sem a mudança (1.2.1) | Obrigatório para todo teste novo | 6 dos 62 defeitos do ARCA eram testes que passavam sem a mudança; a conferência é barata |
 
 ## Perguntas em aberto
 

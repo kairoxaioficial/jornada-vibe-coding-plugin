@@ -1,8 +1,8 @@
 # PRD — Product Requirements Document
 
 > **Projeto:** Jornada IA Vibe Coding — sistema de metodologia para Claude Code
-> **Versão:** 1.2
-> **Última atualização:** 16/10/2026 (v1.2: sem ponytail, Opus planeja e Sonnet executa, injeção enxuta)
+> **Versão:** 1.2.1
+> **Última atualização:** 17/10/2026 (v1.2.1: lista de ângulos, esforço do executor, Ultracode com pergunta antes, auditoria antes de publicar, aviso de esforço; v1.2: sem ponytail, Opus planeja e Sonnet executa, injeção enxuta)
 > **Status:** ✅ Aprovado (descreve o sistema já construído e em uso)
 
 ## 1. Objetivo do sistema
@@ -80,6 +80,14 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - [x] SKILL.md mais leve: detalhes de fases raras ficam em `references/detalhes-skill.md`, lidos quando a fase chega.
 - [x] Testes automatizados dos hooks (`tests/testar-hooks.sh`).
 
+**Versão 1.2.1 (17/10/2026)**
+- [ ] Lista de ângulos obrigatória antes de cada ordem de serviço: concorrência e travas; permissão com campo vazio ou anônimo; entrada estranha; cancelar, repetir, desfazer e reprovar depois de aprovar; dado real da produção; estados de erro, vazio e carregando; frases de tela que prometem algo; teste que reprova sem a mudança; integração com outras frentes; 360 px, teclado e leitor de tela.
+- [ ] Executor com esforço próprio: `high` por padrão; `xhigh` nas etapas difíceis (migration e dado de produção, concorrência e travas, integração externa, partes de permissão ou pagamento fora do núcleo sensível).
+- [ ] Ultracode só em frente grande ou arriscada, perguntando antes e mostrando o tamanho estimado: planejamento por ângulos (Opus) e auditoria adversarial antes de publicar (revisores no Opus, verificadores no Sonnet). Quem implementa é sempre o `jornada-executor`.
+- [ ] Aviso de esforço: o bloco injetado mostra o esforço e o Ultracode da sessão; quando não combinam com a fase do trabalho, o modelo pede ao usuário, uma vez, para ajustar.
+- [ ] Executor novo por etapa; consertos da auditoria vão para um executor novo; trabalho em paralelo só com arquivos separados, números reservados, banco de ensaio próprio e um dono para documentos e ferramentas compartilhadas.
+- [ ] Teste novo só vale se reprovar sem a mudança.
+
 ## 6. Funcionalidades que ficam fora da primeira versão
 
 - Ativação automática da metodologia sem comando explícito do usuário (decisão deliberada: o modo só liga quando pedido).
@@ -105,6 +113,10 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - Concluídas todas as etapas do PLANO: revisão de segurança → documentação final → deploy (se pedido), nesta ordem.
 - Quem planeja e revisa é o Opus; quem implementa a etapa é o executor Sonnet, sempre a partir de uma ordem de serviço escrita. O executor nunca faz commit e para quando a ordem de serviço não basta. Mudança pequena, código sensível de segurança e documentos não são delegados.
 - Com a Jornada ativa, o ponytail fica desligado, mesmo que outra regra peça.
+- (v1.2.1) Antes de cada ordem de serviço, o Opus passa pela lista de ângulos; cada ângulo vira requisito na ordem de serviço ou "não se aplica".
+- (v1.2.1) Workflow com vários agentes (Ultracode) só em frente grande ou arriscada, e só com o ok do usuário dado depois de ver o tamanho estimado — salvo quando o próprio usuário pediu no comando. Dentro do workflow, quem implementa é o `jornada-executor`; buscas e verificações rodam no Sonnet; ângulos e revisões, no Opus.
+- (v1.2.1) Esforço: conversa principal em `high`; executor em `high`, e `xhigh` nas etapas difíceis; `max` só por escolha do usuário, para um problema muito difícil. O modelo não muda o esforço da conversa sozinho: pede ao usuário, uma vez.
+- (v1.2.1) Teste novo só vale se reprovar sem a mudança.
 
 ## 8. Informações que o sistema precisa controlar
 
@@ -115,6 +127,7 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - **Situação dos documentos do projeto:** existência de cada documento obrigatório, verificada a cada prompt.
 - **Situação das nove ferramentas:** instaladas/faltando, com log de instalação automática.
 - **Contador de injeção por sessão:** quantos comandos desde o último protocolo completo (decide bloco completo ou curto).
+- **Ponto de partida do aviso de esforço por sessão (v1.2.1):** tamanho do histórico da conversa no último início ou retomada do processo; o esforço e o Ultracode são lidos do `/effort` registrado depois dele, ou das configurações.
 - **Nível do modo de saída comprimida:** persistido entre sessões.
 - **Os dez documentos do projeto em si** (PRD, DESIGN, DECISOES_TECNICAS, FSD, INSUMOS, PLANO, STATUS, ERROS, CLAUDE.md, CHECKLIST) — criados e mantidos dentro de cada projeto, não no sistema.
 
@@ -142,6 +155,10 @@ A metodologia da Hostnet resolve o método, mas cobrava disciplina manual: o usu
 - (v1.2) Nenhuma instrução do plugin manda usar o ponytail; o bloco injetado diz que ele fica desligado.
 - (v1.2) O protocolo completo chega na 1ª mensagem da sessão, depois de compactar/limpar e a cada 10 comandos; nos demais chega o lembrete curto.
 - (v1.2) As etapas de código são implementadas pelo executor Sonnet e revisadas pelo Opus antes do commit.
+- (v1.2.1) O bloco injetado mostra o esforço e o Ultracode da sessão, com a origem da informação.
+- (v1.2.1) O executor roda em `high` por padrão; a ordem de serviço declara quando a etapa vai em `xhigh`.
+- (v1.2.1) Nenhum workflow com vários agentes é aberto sem o ok do usuário, salvo quando ele mesmo pediu no comando.
+- (v1.2.1) Toda ordem de serviço traz os ângulos considerados, e todo teste novo foi visto reprovando sem a mudança.
 
 ## 11. Dúvidas ou decisões pendentes
 
