@@ -79,7 +79,7 @@ Se a marca não puder ser lida ou gravada, o hook manda o bloco completo (falha 
 
 Detalhe operacional em `skills/jornada-vibe-coding/references/roteamento-modelos.md`.
 
-1. **Sessão principal (Opus):** P1 leitura pelo grafo, P2–P4 documentos e plano, e a **ordem de serviço** da etapa (objetivo, contexto a ler, arquivos, contratos, regras, interface, segurança, testes, fora do escopo, critério de pronto).
+1. **Sessão principal (Opus):** P1 leitura pelo grafo, P2–P4 documentos e plano, e a **ordem de serviço** da etapa (objetivo, contexto a ler, arquivos, contratos, regras, interface, segurança, ângulos, testes, esforço, paralelo, fora do escopo, critério de pronto).
 2. **Executor (`jornada-executor`, Sonnet):** recebe a ordem de serviço pela ferramenta Agent, implementa a etapa, escreve e roda os testes, registra os erros em `docs/ERROS.md` e devolve um relatório curto. Não faz commit, não muda PRD/FSD/DECISOES/DESIGN/PLANO/STATUS, não decide arquitetura, para e relata quando a ordem de serviço não basta.
 3. **Revisão (Opus):** confere o diff contra a ordem de serviço, o FSD, o DESIGN e a segurança; roda os testes de novo; valida a interface por screenshot quando houver; pede correções ao mesmo executor (SendMessage) até 2 rodadas; depois assume. Fecha com STATUS, matriz de impacto, commit e os três checklists.
 4. **Fica no Opus, sem delegar:** mudança pequena (até ~30 linhas em até 2 arquivos), código sensível de segurança, documentos da metodologia, correção após 2 rodadas sem sucesso.

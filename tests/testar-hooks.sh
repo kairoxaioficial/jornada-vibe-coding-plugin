@@ -70,6 +70,16 @@ if contem "$saida" "jornada-executor" && contem "$saida" "ORDEM DE SERVICO"; the
 if [ -f "$S/../references/roteamento-modelos.md" ] && grep -q "roteamento-modelos.md" "$S/../SKILL.md"; then ok "guia de roteamento existe e o SKILL.md aponta"; else falha "guia de roteamento existe e o SKILL.md aponta"; fi
 if grep -q 'agents/\*.md' "$RAIZ/instalar.sh"; then ok "instalar.sh copia os agentes"; else falha "instalar.sh copia os agentes"; fi
 
+# 5b. 1.2.1: esforco proprio do executor e regras novas do guia de roteamento
+if cabecalho "$AG" | grep -q '^effort: high$'; then ok "agente jornada-executor com effort: high"; else falha "agente jornada-executor com effort: high"; fi
+RT="$S/../references/roteamento-modelos.md"; faltam=""
+for sec in "## Lista de ângulos" "## Esforço" "## Ultracode" "## Ciclo do executor" "## Paralelismo seguro" "reprova sem a mudança"; do
+  grep -qF -- "$sec" "$RT" || faltam="$faltam [$sec]"
+done
+if [ -z "$faltam" ]; then ok "guia de roteamento com as regras da 1.2.1"; else falha "guia de roteamento com as regras da 1.2.1:$faltam"; fi
+if grep -qF 'ferramenta **Workflow**' "$S/../SKILL.md" && grep -qF '/effort ultracode off' "$S/../SKILL.md"; then ok "SKILL.md com a politica do Ultracode e do esforco"; else falha "SKILL.md com a politica do Ultracode e do esforco"; fi
+if grep -qF 'reprova sem a mudança' "$AG"; then ok "executor confere teste que reprova sem a mudanca"; else falha "executor confere teste que reprova sem a mudanca"; fi
+
 # 6. SessionStart e prompt calados com a Jornada desligada
 rm -f "$JORNADA_HOME/global-on"
 if [ -z "$(inicio s0 startup)" ]; then ok "SessionStart calado com a Jornada desligada"; else falha "SessionStart calado com a Jornada desligada"; fi

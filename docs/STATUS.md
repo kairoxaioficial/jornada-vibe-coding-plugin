@@ -15,8 +15,8 @@
 | 5 | SKILL.md mais leve | concluída | 16/10/2026 | ver git log |
 | 6 | Instalar, publicar e conferir | concluída | 16/10/2026 | ver git log |
 | 7 | Documentos da 1.2.1 | concluída | 17/10/2026 | ver git log |
-| 8 | Regras novas da metodologia | em andamento | 17/10/2026 | — |
-| 9 | Aviso de esforço no hook | pendente | — | — |
+| 8 | Regras novas da metodologia | concluída | 17/10/2026 | ver git log |
+| 9 | Aviso de esforço no hook | em andamento | 17/10/2026 | — |
 | 10 | Instalar, publicar e conferir (1.2.1) | pendente | — | — |
 
 ## Detalhamento das etapas
@@ -67,6 +67,12 @@
 - Testes: `bash tests/testar-hooks.sh` → 39 testes, 0 falhas (nenhum código mudou nesta etapa).
 - Erros: nenhum.
 - Próxima etapa: 8 — regras novas da metodologia.
+
+### Etapa 8 — Regras novas da metodologia (17/10/2026)
+- Arquivos: `agents/jornada-executor.md` (`effort: high`; item Ângulos da ordem de serviço; teste que reprova sem a mudança; trabalho em paralelo; menor largura do DESIGN), `skills/jornada-vibe-coding/references/roteamento-modelos.md` (versão 1.2.1: lista de ângulos, ordem de serviço com ângulos, esforço e paralelo, seção de esforço, Ultracode com pergunta antes e papéis e modelos de cada agente, auditoria antes de publicar, ciclo do executor, paralelismo seguro), `skills/jornada-vibe-coding/SKILL.md` (P4, P5 e P6; roteamento ampliado; seção nova "ESFORÇO E ULTRACODE"), `docs/FSD.md` (conteúdo da ordem de serviço), `tests/testar-hooks.sh` (4 testes novos).
+- Testes: `bash tests/testar-hooks.sh` → 43 testes, 0 falhas. SKILL.md com 47.617 bytes (limite do teste: 50 KB).
+- Erros: nenhum.
+- Próxima etapa: 9 — aviso de esforço no hook.
 
 ### Revisão de segurança dos scripts (Passo 5) — 16/10/2026
 - Texto do prompt só é comparado em `case`, nunca executado nem interpolado em comando.
